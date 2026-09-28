@@ -530,9 +530,32 @@ dialog-component#search-modal .search-input::placeholder {
 dialog-component#search-modal .predictive-search-form__content-wrapper {
   border-radius: 0 0 20px 20px !important;
   background: transparent !important;
+  overflow: visible !important;
 }
 dialog-component#search-modal .predictive-search-results__inner {
   font-family: var(--font-body--family, sans-serif) !important;
+}
+dialog-component#search-modal .predictive-search-form__footer {
+  position: static !important;
+  background: transparent !important;
+  padding: 0 20px 20px !important;
+}
+dialog-component#search-modal .predictive-search-form__content {
+  padding-block-end: 0 !important;
+}
+dialog-component#search-modal .predictive-search__reset-button,
+dialog-component#search-modal .predictive-search__search-button,
+dialog-component#search-modal .predictive-search-results__title {
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px;
+}
+
+/* Site-wide: buttons/labels in caps, except footer links and product-page content */
+:is(button, .button):not(.footer-column *) {
+  text-transform: uppercase;
+}
+main[data-template="product"] :is(button, .button) {
+  text-transform: none;
 }
 </style>
 

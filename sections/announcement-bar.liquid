@@ -1,14 +1,16 @@
-<div class="announcement-bar">
-  <div class="announcement-text">
-    {% assign phrases = section.settings.message | split: " — " %}
-    {% for phrase in phrases %}
-      <span class="announcement-phrase">{{ phrase }}</span>
-    {% endfor %}
-    {% for phrase in phrases %}
-      <span class="announcement-phrase">{{ phrase }}</span>
-    {% endfor %}
+{% unless template == 'product' %}
+  <div class="announcement-bar">
+    <div class="announcement-text">
+      {% assign phrases = section.settings.message | split: " — " %}
+      {% for phrase in phrases %}
+        <span class="announcement-phrase">{{ phrase }}</span>
+      {% endfor %}
+      {% for phrase in phrases %}
+        <span class="announcement-phrase">{{ phrase }}</span>
+      {% endfor %}
+    </div>
   </div>
-</div>
+{% endunless %}
 
 <style>
 .announcement-bar {
