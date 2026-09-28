@@ -3,26 +3,25 @@
   <!-- Header Desktop -->
   <div class="header-wrapper">
     
-    <!-- Menu Esquerdo (Homem / Mulher / Coleções) -->
+    <!-- Left menu (Men / Women) -->
     <nav class="menu-left">
       <ul>
-        <li><a href="/collections/homem">Homem</a></li>
-        <li><a href="/collections/mulher">Mulher</a></li>
-        <li><a href="/collections">Coleções</a></li>
+        <li><a href="/collections/homem">Men</a></li>
+        <li><a href="/collections/mulher">Women</a></li>
       </ul>
     </nav>
 
-    <!-- Logo Central (imagem sempre) -->
+    <!-- Center logo (always an image) -->
     <div class="logo">
       <a href="{{ routes.root_url }}">
         <img src="{{ section.settings.logo | image_url: width: 160 }}" alt="{{ shop.name }}" class="site-logo site-logo-desktop">
       </a>
     </div>
 
-    <!-- Menu Direito + Ícones -->
+    <!-- Right menu + icons -->
     <div class="header__actions">
-      
-      <!-- Menu Direito (dinâmico configurável) -->
+
+      <!-- Right menu (configurable) -->
       <nav class="menu-right">
         {% if section.settings.menu_right != blank %}
           <ul>
@@ -40,7 +39,7 @@
         {% endif %}
       </nav>
 
-      <!-- Ícones -->
+      <!-- Icons -->
       <div class="header__icons">
         <a href="/search" class="header__icon">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -72,7 +71,7 @@
   <!-- Header Mobile -->
   <div class="header-mobile">
     <div class="mobile-left">
-      <!-- Botão Menu (abre sidebar) -->
+      <!-- Menu button (opens sidebar) -->
       <div class="mobile-menu">
         <button class="mobile-menu-toggle">
           <span class="hamburger-box">
@@ -81,7 +80,7 @@
         </button>
       </div>
 
-      <!-- Pesquisa -->
+      <!-- Search -->
       <a href="/search" class="header__icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="11" cy="11" r="8"></circle>
@@ -90,7 +89,7 @@
       </a>
     </div>
 
-    <!-- Logo ao centro -->
+    <!-- Center logo -->
     <div class="mobile-logo">
       <a href="{{ routes.root_url }}">
         <img src="{{ section.settings.logo | image_url: width: 140 }}" alt="{{ shop.name }}" class="site-logo site-logo-mobile">
@@ -98,7 +97,7 @@
     </div>
 
     <div class="mobile-right">
-      <!-- Conta -->
+      <!-- Account -->
       <a href="/account" class="header__icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="7" r="4"></circle>
@@ -106,7 +105,7 @@
         </svg>
       </a>
 
-      <!-- Carrinho -->
+      <!-- Cart -->
       <a href="/cart" class="header__icon cart-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M6 6h15l-1.5 9h-13z"></path>
@@ -122,9 +121,8 @@
   <div class="mobile-sidebar">
     <button class="close-sidebar">✕</button>
     <ul>
-      <li><a href="/collections/homem">Homem</a></li>
-      <li><a href="/collections/mulher">Mulher</a></li>
-      <li><a href="/collections">Coleções</a></li>
+      <li><a href="/collections/homem">Men</a></li>
+      <li><a href="/collections/mulher">Women</a></li>
     </ul>
   </div>
 
@@ -199,7 +197,7 @@
   align-items: center;
   gap: 24px;
   margin-left: auto;
-  <!-- Selector de País/Moeda -->
+  <!-- Country/Currency selector -->
 <div class="header__icon localization-icon">
   {% form 'localization' %}
     <button type="button" class="localization-toggle">
@@ -208,7 +206,7 @@
 
     <div class="localization-dropdown">
       {% if localization.available_countries.size > 1 %}
-        <label>País</label>
+        <label>Country</label>
         <select name="country_code" onchange="this.form.submit()">
           {% for country in localization.available_countries %}
             <option value="{{ country.iso_code }}" {% if country.iso_code == localization.country.iso_code %}selected{% endif %}>
@@ -219,7 +217,7 @@
       {% endif %}
 
       {% if localization.available_currencies.size > 1 %}
-        <label>Moeda</label>
+        <label>Currency</label>
         <select name="currency_code" onchange="this.form.submit()">
           {% for currency in localization.available_currencies %}
             <option value="{{ currency.iso_code }}" {% if currency.iso_code == localization.currency.iso_code %}selected{% endif %}>
@@ -233,7 +231,7 @@
 </div>
 }
 
-/* Ícones */
+/* Icons */
 .header__icons, .mobile-right {
   display: flex;
   align-items: center;
@@ -388,12 +386,12 @@ document.addEventListener("DOMContentLoaded", function() {
     {
       "type": "image_picker",
       "id": "logo",
-      "label": "Logotipo"
+      "label": "Logo"
     },
     {
       "type": "link_list",
       "id": "menu_right",
-      "label": "Menu Direito"
+      "label": "Right menu"
     }
   ]
 }

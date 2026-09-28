@@ -5,8 +5,8 @@
   
   <!-- Links -->
   <div class="banner-links">
-    <a href="/collections/homem" class="link-homem">HOMEM</a>
-    <a href="/collections/mulher" class="link-mulher">MULHER</a>
+    <a href="/collections/homem" class="link-homem">MEN</a>
+    <a href="/collections/mulher" class="link-mulher">WOMEN</a>
   </div>
 </div>
 
@@ -14,16 +14,16 @@
 .banner-container {
   position: relative;
   width: 100%;
-  min-height: 500px; /* altura no desktop */
+  min-height: 500px; /* desktop height */
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
 }
 
-/* Links fixados em baixo */
+/* Links pinned to the bottom */
 .banner-links {
   position: absolute;
-  bottom: 30px; /* distância da base da imagem */
+  bottom: 30px; /* distance from the bottom of the image */
   left: 0;
   right: 0;
   display: flex;
@@ -34,7 +34,7 @@
 .banner-links a {
   font-weight: bold;
   font-size: 18px;
-  color: white; /* muda se a imagem for clara */
+  color: white; /* change if the image is light */
   text-decoration: none;
   border-bottom: 2px solid white;
   transition: 0.3s;
@@ -44,12 +44,12 @@
   opacity: 0.7;
 }
 
-/* Ajustes Mobile */
+/* Mobile adjustments */
 @media (max-width: 768px) {
   .banner-container {
-    min-height: auto; /* deixa a imagem controlar a altura */
-    aspect-ratio: 9/16; /* mantém proporção vertical tipo stories */
-    background-size: cover; /* enche o espaço sem barras pretas */
+    min-height: auto; /* let the image control the height */
+    aspect-ratio: 9/16; /* keeps a vertical stories-like ratio */
+    background-size: cover; /* fills the space without black bars */
     background-position: center;
     background-color: black;
     background-image: url('{{ section.settings.banner_image_mobile | image_url: width: 1000 }}');
@@ -65,7 +65,7 @@
   }
 }
   .banner-links {
-    bottom: 20px; /* sobe um pouco no mobile */
+    bottom: 20px; /* moves up slightly on mobile */
     padding: 0 20px;
   }
 
@@ -77,22 +77,22 @@
 
 {% schema %}
 {
-  "name": "Banner com Links",
+  "name": "Banner with Links",
   "settings": [
     {
       "type": "image_picker",
       "id": "banner_image",
-      "label": "Imagem do Banner (Desktop)"
+      "label": "Banner Image (Desktop)"
     },
     {
       "type": "image_picker",
       "id": "banner_image_mobile",
-      "label": "Imagem do Banner (Mobile)"
+      "label": "Banner Image (Mobile)"
     }
   ],
   "presets": [
     {
-      "name": "Banner com Links"
+      "name": "Banner with Links"
     }
   ]
 }
