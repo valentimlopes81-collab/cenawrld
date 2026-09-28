@@ -47,6 +47,10 @@
 
   <!-- Social + Copyright -->
   <div class="footer-bottom">
+    {% if section.settings.show_country_selector %}
+      {% render 'localization-pill', id: 'footer' %}
+    {% endif %}
+
     <div class="footer-social">
       {% if section.settings.social_instagram != blank %}
         <a href="{{ section.settings.social_instagram }}" target="_blank" aria-label="Instagram" rel="noopener">
@@ -72,23 +76,6 @@
     <p class="footer-copyright">{{ section.settings.copyright }}</p>
   </div>
 </div>
-
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    const display = document.querySelector(".localization-display");
-    const dropdown = document.querySelector(".localization-dropdown");
-    if (display && dropdown) {
-      display.addEventListener("click", () => {
-        dropdown.classList.toggle("open");
-      });
-      document.addEventListener("click", (e) => {
-        if (!display.contains(e.target) && !dropdown.contains(e.target)) {
-          dropdown.classList.remove("open");
-        }
-      });
-    }
-  });
-</script>
 
 <style>
 .custom-footer {
@@ -210,13 +197,22 @@
   margin-bottom: 0;
 }
 
-/* Social + Copyright fixos no fundo */
+/* Social + Copyright pinned to the bottom */
 .footer-bottom {
   position: absolute;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
+}
+.footer-bottom .localization-icon {
+  display: inline-flex;
+  margin-bottom: 14px;
+}
+.footer-bottom .localization-dropdown {
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
 }
 .footer-social {
   display: flex;
