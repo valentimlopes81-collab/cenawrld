@@ -140,7 +140,7 @@
   --header-fg: #000;
   width: 100%;
   padding: 10px 20px;
-  font-family: sans-serif;
+  font-family: var(--font-body--family, sans-serif);
   position: relative;
   background: rgba(255, 255, 255, 0.45);
   backdrop-filter: blur(16px) saturate(160%);
@@ -197,7 +197,7 @@
   padding: 0;
 }
 .menu-left a, .menu-right a {
-  font-family: sans-serif;
+  font-family: var(--font-body--family, sans-serif);
   font-weight: bold;
   text-transform: uppercase;
   text-decoration: none;
@@ -454,7 +454,7 @@
 .mobile-nav-dropdown li { margin-bottom: 16px; }
 .mobile-nav-dropdown li:last-child { margin-bottom: 0; }
 .mobile-nav-dropdown a {
-  font-family: sans-serif;
+  font-family: var(--font-body--family, sans-serif);
   font-weight: bold;
   text-transform: uppercase;
   text-decoration: none;
@@ -496,6 +496,43 @@ dialog-component#search-modal .search-modal__content {
 }
 dialog-component#search-modal .search-modal__content::backdrop {
   background: transparent !important;
+}
+dialog-component#search-modal predictive-search-component {
+  font-family: var(--font-body--family, sans-serif) !important;
+  background: transparent !important;
+}
+dialog-component#search-modal .predictive-search-form__header {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15) !important;
+  border-radius: 0 !important;
+  padding: 16px 20px !important;
+}
+dialog-component#search-modal .predictive-search-form__header-inner {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+dialog-component#search-modal .predictive-search-form__header-inner:focus-within {
+  outline: none !important;
+}
+dialog-component#search-modal .search-input {
+  font-family: var(--font-body--family, sans-serif) !important;
+  font-size: 15px !important;
+  letter-spacing: 0.5px;
+}
+dialog-component#search-modal .search-input::placeholder {
+  color: rgba(0, 0, 0, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 13px;
+}
+dialog-component#search-modal .predictive-search-form__content-wrapper {
+  border-radius: 0 0 20px 20px !important;
+  background: transparent !important;
+}
+dialog-component#search-modal .predictive-search-results__inner {
+  font-family: var(--font-body--family, sans-serif) !important;
 }
 </style>
 
