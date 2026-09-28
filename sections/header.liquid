@@ -42,37 +42,7 @@
 
       <!-- Icons -->
       <div class="header__icons">
-        <div class="header__icon localization-icon">
-          {% form 'localization' %}
-            <button type="button" class="localization-toggle" aria-label="Country and currency">
-              🇪🇺
-            </button>
-
-            <div class="localization-dropdown">
-              {% if localization.available_countries.size > 1 %}
-                <label>Country</label>
-                <select name="country_code" onchange="this.form.submit()">
-                  {% for country in localization.available_countries %}
-                    <option value="{{ country.iso_code }}" {% if country.iso_code == localization.country.iso_code %}selected{% endif %}>
-                      {{ country.name }} ({{ country.currency.iso_code }})
-                    </option>
-                  {% endfor %}
-                </select>
-              {% endif %}
-
-              {% if localization.available_currencies.size > 1 %}
-                <label>Currency</label>
-                <select name="currency_code" onchange="this.form.submit()">
-                  {% for currency in localization.available_currencies %}
-                    <option value="{{ currency.iso_code }}" {% if currency.iso_code == localization.currency.iso_code %}selected{% endif %}>
-                      {{ currency.iso_code }}
-                    </option>
-                  {% endfor %}
-                </select>
-              {% endif %}
-            </div>
-          {% endform %}
-        </div>
+        {% render 'localization-pill', id: 'desktop' %}
 
         <a href="/search" class="header__icon">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -130,6 +100,8 @@
     </div>
 
     <div class="mobile-right">
+      {% render 'localization-pill', id: 'mobile' %}
+
       <!-- Account -->
       <a href="/account" class="header__icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -150,34 +122,35 @@
     </div>
   </div>
 
-  <!-- Sidebar Mobile -->
-  <div class="mobile-sidebar">
-    <button class="close-sidebar">✕</button>
-    <ul>
-      <li><a href="{{ routes.all_products_collection_url }}">Shop All</a></li>
-      <li><a href="/collections/homem">Men</a></li>
-      <li><a href="/collections/mulher">Women</a></li>
-    </ul>
-  </div>
 
 </header>
+
+<!-- Sidebar Mobile -->
+<div class="mobile-sidebar">
+  <button class="close-sidebar">✕</button>
+  <ul>
+    <li><a href="{{ routes.all_products_collection_url }}">Shop All</a></li>
+    <li><a href="/collections/homem">Men</a></li>
+    <li><a href="/collections/mulher">Women</a></li>
+  </ul>
+</div>
 
 <style>
 /* General */
 #header-group {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 12px;
+  left: 12px;
+  right: 12px;
   z-index: var(--layer-sticky, 8);
 }
 
 #MainContent {
-  padding-top: var(--cena-header-total-height, 96px);
+  padding-top: calc(var(--cena-header-total-height, 96px) + 28px);
 }
 
-#MainContent > .hero-wrapper:first-child {
-  margin-top: calc(-1 * var(--cena-nav-height, 64px));
+#MainContent .hero-wrapper:first-child {
+  margin-top: calc(-1 * (var(--cena-header-total-height, 96px) + 28px));
 }
 
 .scuffers-header {
@@ -188,10 +161,13 @@
   background: rgba(255, 255, 255, 0.55);
   backdrop-filter: blur(16px) saturate(160%);
   -webkit-backdrop-filter: blur(16px) saturate(160%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
 }
 .site-logo {
   width: auto;
+  filter: brightness(0) invert(1);
+  mix-blend-mode: difference;
 }
 .site-logo-desktop { max-height: 32px; }
 .site-logo-mobile { max-height: 30px; }
@@ -276,12 +252,40 @@
   position: relative;
 }
 .localization-toggle {
-  background: none;
-  border: none;
-  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
   line-height: 1;
-  padding: 0;
+  color: #000;
   cursor: pointer;
+}
+.localization-flag {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+}
+.localization-currency {
+  text-transform: uppercase;
+}
+.localization-caret {
+  display: flex;
+  align-items: center;
+  width: 10px;
+  height: 10px;
+}
+.localization-caret svg {
+  width: 100%;
+  height: 100%;
 }
 .localization-dropdown {
   display: none;
@@ -444,21 +448,25 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   });
 
-  const localizationToggle = document.querySelector(".localization-toggle");
-  const localizationDropdown = document.querySelector(".localization-dropdown");
+  const localizationInstances = document.querySelectorAll("[data-localization-instance]");
 
-  if (localizationToggle && localizationDropdown) {
+  localizationInstances.forEach((instance) => {
+    const localizationToggle = instance.querySelector(".localization-toggle");
+    const localizationDropdown = instance.querySelector(".localization-dropdown");
+
+    if (!localizationToggle || !localizationDropdown) return;
+
     localizationToggle.addEventListener("click", (event) => {
       event.stopPropagation();
       localizationDropdown.classList.toggle("active");
     });
 
     document.addEventListener("click", (event) => {
-      if (!localizationDropdown.contains(event.target) && event.target !== localizationToggle) {
+      if (!instance.contains(event.target)) {
         localizationDropdown.classList.remove("active");
       }
     });
-  }
+  });
 });
 </script>
 

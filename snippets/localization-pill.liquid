@@ -1,0 +1,43 @@
+{%- doc -%}
+  Renders a compact country/currency pill (flag + currency code + caret)
+  that opens a dropdown with the country and currency selectors.
+
+  @param {string} id - A unique suffix so multiple instances (desktop/mobile) don't collide.
+{%- enddoc -%}
+
+<div class="header__icon localization-icon" data-localization-instance="{{ id }}">
+  {% form 'localization' %}
+    <button type="button" class="localization-toggle" aria-label="Country and currency">
+      <span
+        class="localization-flag"
+        style="background-image: url({{ localization.country | image_url: width: 32 }});"
+      ></span>
+      <span class="localization-currency">{{ localization.country.currency.iso_code }}</span>
+      <span class="localization-caret">{{ 'icon-caret.svg' | inline_asset_content }}</span>
+    </button>
+
+    <div class="localization-dropdown">
+      {% if localization.available_countries.size > 1 %}
+        <label>Country</label>
+        <select name="country_code" onchange="this.form.submit()">
+          {% for country in localization.available_countries %}
+            <option value="{{ country.iso_code }}" {% if country.iso_code == localization.country.iso_code %}selected{% endif %}>
+              {{ country.name }} ({{ country.currency.iso_code }})
+            </option>
+          {% endfor %}
+        </select>
+      {% endif %}
+
+      {% if localization.available_currencies.size > 1 %}
+        <label>Currency</label>
+        <select name="currency_code" onchange="this.form.submit()">
+          {% for currency in localization.available_currencies %}
+            <option value="{{ currency.iso_code }}" {% if currency.iso_code == localization.currency.iso_code %}selected{% endif %}>
+              {{ currency.iso_code }}
+            </option>
+          {% endfor %}
+        </select>
+      {% endif %}
+    </div>
+  {% endform %}
+</div>
