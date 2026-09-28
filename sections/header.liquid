@@ -125,7 +125,7 @@
   top: 12px;
   left: 12px;
   right: 12px;
-  z-index: var(--layer-sticky, 8);
+  z-index: var(--layer-overlay, 16);
 }
 
 #MainContent {
@@ -427,11 +427,12 @@
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
   padding: 20px;
-  z-index: var(--layer-sticky, 8);
+  z-index: var(--layer-overlay, 16);
   opacity: 0;
+  visibility: hidden;
   transform: translateY(-8px);
   color: var(--header-fg);
-  transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.25s ease, color 0.25s ease;
+  transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.25s ease, color 0.25s ease, visibility 0.2s ease;
   pointer-events: none;
 }
 .mobile-nav-dropdown.is-on-dark {
@@ -441,6 +442,7 @@
 .mobile-nav-dropdown.active {
   display: block;
   opacity: 1;
+  visibility: visible;
   transform: translateY(0);
   pointer-events: auto;
 }
