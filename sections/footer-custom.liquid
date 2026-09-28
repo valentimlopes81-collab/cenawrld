@@ -47,12 +47,6 @@
 
   <!-- Social + Copyright -->
   <div class="footer-bottom">
-    {% if section.settings.show_country_selector %}
-      <div class="footer-localization-mobile-only">
-        {% render 'localization-pill', id: 'footer' %}
-      </div>
-    {% endif %}
-
     <div class="footer-social">
       {% if section.settings.social_instagram != blank %}
         <a href="{{ section.settings.social_instagram }}" target="_blank" aria-label="Instagram" rel="noopener">
@@ -75,7 +69,14 @@
         </a>
       {% endif %}
     </div>
-    <p class="footer-copyright">{{ section.settings.copyright }}</p>
+    <div class="footer-copyright-row">
+      <p class="footer-copyright">{{ section.settings.copyright }}</p>
+      {% if section.settings.show_country_selector %}
+        <div class="footer-localization-mobile-only">
+          {% render 'localization-pill', id: 'footer' %}
+        </div>
+      {% endif %}
+    </div>
   </div>
 </div>
 
@@ -212,7 +213,6 @@
 }
 .footer-bottom .localization-icon {
   display: inline-flex;
-  margin-bottom: 14px;
 }
 .footer-bottom .localization-dropdown {
   left: 50%;
@@ -232,6 +232,13 @@
 .footer-social a:hover {
   opacity: 0.6;
 }
+.footer-copyright-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
 .footer-copyright {
   font-size: 14px;
   color: #777;
@@ -239,7 +246,7 @@
 
 @media (max-width: 768px) {
   .footer-localization-mobile-only {
-    display: block;
+    display: inline-flex;
   }
 }
 </style>

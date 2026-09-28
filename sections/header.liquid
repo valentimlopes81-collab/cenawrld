@@ -459,6 +459,26 @@
   .header-wrapper { display: none; }
   .header-mobile { display: flex; }
 }
+
+/* Search bar — anchored right below the floating header instead of a centered modal */
+dialog-component#search-modal .search-modal__content {
+  position: fixed !important;
+  top: calc(12px + var(--cena-header-total-height, 96px) + 8px) !important;
+  left: 12px !important;
+  right: 12px !important;
+  bottom: auto !important;
+  width: auto !important;
+  max-width: none !important;
+  max-height: 70vh !important;
+  margin: 0 !important;
+  border-radius: 20px !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(16px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
+}
+dialog-component#search-modal .search-modal__content::backdrop {
+  background: transparent !important;
+}
 </style>
 
 <script>
