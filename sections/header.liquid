@@ -41,6 +41,38 @@
 
       <!-- Icons -->
       <div class="header__icons">
+        <div class="header__icon localization-icon">
+          {% form 'localization' %}
+            <button type="button" class="localization-toggle" aria-label="Country and currency">
+              🇪🇺
+            </button>
+
+            <div class="localization-dropdown">
+              {% if localization.available_countries.size > 1 %}
+                <label>Country</label>
+                <select name="country_code" onchange="this.form.submit()">
+                  {% for country in localization.available_countries %}
+                    <option value="{{ country.iso_code }}" {% if country.iso_code == localization.country.iso_code %}selected{% endif %}>
+                      {{ country.name }} ({{ country.currency.iso_code }})
+                    </option>
+                  {% endfor %}
+                </select>
+              {% endif %}
+
+              {% if localization.available_currencies.size > 1 %}
+                <label>Currency</label>
+                <select name="currency_code" onchange="this.form.submit()">
+                  {% for currency in localization.available_currencies %}
+                    <option value="{{ currency.iso_code }}" {% if currency.iso_code == localization.currency.iso_code %}selected{% endif %}>
+                      {{ currency.iso_code }}
+                    </option>
+                  {% endfor %}
+                </select>
+              {% endif %}
+            </div>
+          {% endform %}
+        </div>
+
         <a href="/search" class="header__icon">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8"></circle>
@@ -129,7 +161,7 @@
 </header>
 
 <style>
-/* Geral */
+/* General */
 .scuffers-header {
   width: 100%;
   border-bottom: 1px solid #eee;
@@ -183,7 +215,7 @@
   font-weight: bold;
 }
 
-/* Logo central exato */
+/* Exact center logo */
 .logo {
   position: absolute;
   left: 50%;
@@ -197,38 +229,6 @@
   align-items: center;
   gap: 24px;
   margin-left: auto;
-  <!-- Country/Currency selector -->
-<div class="header__icon localization-icon">
-  {% form 'localization' %}
-    <button type="button" class="localization-toggle">
-      🇪🇺
-    </button>
-
-    <div class="localization-dropdown">
-      {% if localization.available_countries.size > 1 %}
-        <label>Country</label>
-        <select name="country_code" onchange="this.form.submit()">
-          {% for country in localization.available_countries %}
-            <option value="{{ country.iso_code }}" {% if country.iso_code == localization.country.iso_code %}selected{% endif %}>
-              {{ country.name }} ({{ country.currency.iso_code }})
-            </option>
-          {% endfor %}
-        </select>
-      {% endif %}
-
-      {% if localization.available_currencies.size > 1 %}
-        <label>Currency</label>
-        <select name="currency_code" onchange="this.form.submit()">
-          {% for currency in localization.available_currencies %}
-            <option value="{{ currency.iso_code }}" {% if currency.iso_code == localization.currency.iso_code %}selected{% endif %}>
-              {{ currency.iso_code }}
-            </option>
-          {% endfor %}
-        </select>
-      {% endif %}
-    </div>
-  {% endform %}
-</div>
 }
 
 /* Icons */
@@ -250,7 +250,54 @@
   display: block;
 }
 
-/* Badge carrinho */
+/* Country/Currency selector */
+.localization-icon {
+  position: relative;
+}
+.localization-toggle {
+  background: none;
+  border: none;
+  font-size: 18px;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+}
+.localization-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 12px;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  padding: 12px;
+  min-width: 180px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  z-index: 60;
+}
+.localization-dropdown.active {
+  display: block;
+}
+.localization-dropdown label {
+  display: block;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+.localization-dropdown select {
+  width: 100%;
+  padding: 6px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+.localization-dropdown select:last-child {
+  margin-bottom: 0;
+}
+
+/* Cart badge */
 .cart-icon { position: relative; }
 .cart-count {
   position: absolute;
@@ -288,7 +335,7 @@
   transform: translateX(-50%);
 }
 
-/* Hamburger estilo caixa */
+/* Boxed hamburger style */
 .mobile-menu-toggle {
   background: #fff;
   border: 1px solid #ccc;
@@ -317,7 +364,7 @@
 .hamburger-inner::before { top: -6px; }
 .hamburger-inner::after { top: 6px; }
 
-/* Sidebar mobile */
+/* Mobile sidebar */
 .mobile-sidebar {
   position: fixed;
   top: 0;
@@ -345,7 +392,7 @@
 }
 .mobile-sidebar li { margin-bottom: 16px; }
 
-/* Responsividade */
+/* Responsiveness */
 @media (min-width: 769px) {
   .header-wrapper { display: flex; }
   .header-mobile { display: none; }
@@ -376,6 +423,22 @@ document.addEventListener("DOMContentLoaded", function() {
       sidebar.classList.remove("active");
     });
   });
+
+  const localizationToggle = document.querySelector(".localization-toggle");
+  const localizationDropdown = document.querySelector(".localization-dropdown");
+
+  if (localizationToggle && localizationDropdown) {
+    localizationToggle.addEventListener("click", (event) => {
+      event.stopPropagation();
+      localizationDropdown.classList.toggle("active");
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!localizationDropdown.contains(event.target) && event.target !== localizationToggle) {
+        localizationDropdown.classList.remove("active");
+      }
+    });
+  }
 });
 </script>
 
