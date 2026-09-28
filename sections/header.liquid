@@ -48,13 +48,6 @@
           {% render 'search' %}
         </div>
 
-        <a href="/account" class="header__icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="7" r="4"></circle>
-            <path d="M2 21c0-5 20-5 20 0"></path>
-          </svg>
-        </a>
-
         <a href="/cart" class="header__icon cart-icon">
           {{ 'icon-cart.svg' | inline_asset_content }}
           <span class="cart-count">{{ cart.item_count }}</span>
@@ -90,14 +83,6 @@
     </div>
 
     <div class="mobile-right">
-      <!-- Account -->
-      <a href="/account" class="header__icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="7" r="4"></circle>
-          <path d="M2 21c0-5 20-5 20 0"></path>
-        </svg>
-      </a>
-
       <!-- Cart -->
       <a href="/cart" class="header__icon cart-icon">
         {{ 'icon-cart.svg' | inline_asset_content }}
@@ -556,6 +541,13 @@ dialog-component#search-modal .predictive-search-results__title {
 }
 main[data-template="product"] :is(button, .button) {
   text-transform: none;
+}
+
+/* Homepage hero: custom desktop-only photo (mobile keeps the original) */
+@media (min-width: 750px) {
+  #MainContent[data-template="index"] .hero__image--desktop {
+    content: url('{{ "hero-desktop.jpg" | asset_url }}') !important;
+  }
 }
 </style>
 
