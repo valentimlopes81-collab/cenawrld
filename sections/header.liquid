@@ -137,20 +137,30 @@
 }
 
 .scuffers-header {
+  --header-fg: #000;
   width: 100%;
   padding: 10px 20px;
   font-family: sans-serif;
   position: relative;
-  background: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.45);
   backdrop-filter: blur(16px) saturate(160%);
   -webkit-backdrop-filter: blur(16px) saturate(160%);
   border-radius: 0 0 20px 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  color: var(--header-fg);
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+.scuffers-header.is-on-dark {
+  --header-fg: #fff;
+  background: rgba(0, 0, 0, 0.4);
 }
 .site-logo {
   width: auto;
+  filter: brightness(0);
+  transition: filter 0.25s ease;
+}
+.scuffers-header.is-on-dark .site-logo {
   filter: brightness(0) invert(1);
-  mix-blend-mode: difference;
 }
 .site-logo-desktop { max-height: 32px; }
 .site-logo-mobile { max-height: 30px; }
@@ -183,7 +193,7 @@
   text-transform: uppercase;
   text-decoration: none;
   font-size: 14px;
-  color: #000;
+  color: inherit;
   letter-spacing: 0.5px;
   transition: opacity 0.2s ease;
 }
@@ -259,8 +269,12 @@
   font-weight: bold;
   letter-spacing: 0.5px;
   line-height: 1;
-  color: #000;
+  color: inherit;
   cursor: pointer;
+}
+.scuffers-header.is-on-dark .localization-toggle {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.25);
 }
 .localization-flag {
   width: 16px;
@@ -357,8 +371,8 @@
 
 /* Boxed hamburger style */
 .mobile-menu-toggle {
-  background: #fff;
-  border: 1px solid #ccc;
+  background: transparent;
+  border: 1px solid currentColor;
   padding: 6px;
   border-radius: 2px;
   cursor: pointer;
@@ -369,12 +383,12 @@
   display: inline-block;
   position: relative;
 }
-.hamburger-inner, 
-.hamburger-inner::before, 
+.hamburger-inner,
+.hamburger-inner::before,
 .hamburger-inner::after {
   width: 20px;
   height: 2px;
-  background-color: #000;
+  background-color: currentColor;
   position: absolute;
   transition: all 0.3s ease;
   content: "";
@@ -386,6 +400,7 @@
 
 /* Mobile nav dropdown — opens from the header, same glass style */
 .mobile-nav-dropdown {
+  --header-fg: #000;
   display: none;
   position: fixed;
   top: calc(12px + var(--cena-header-total-height, 96px) + 8px);
@@ -400,8 +415,13 @@
   z-index: var(--layer-sticky, 8);
   opacity: 0;
   transform: translateY(-8px);
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  color: var(--header-fg);
+  transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.25s ease, color 0.25s ease;
   pointer-events: none;
+}
+.mobile-nav-dropdown.is-on-dark {
+  --header-fg: #fff;
+  background: rgba(0, 0, 0, 0.55);
 }
 .mobile-nav-dropdown.active {
   display: block;
@@ -422,7 +442,7 @@
   text-transform: uppercase;
   text-decoration: none;
   font-size: 16px;
-  color: #000;
+  color: inherit;
   letter-spacing: 0.5px;
 }
 
@@ -486,6 +506,58 @@ document.addEventListener("DOMContentLoaded", function() {
       }
     });
   });
+
+  // Adapts the floating header's colors (logo, text, icons, glass tint)
+  // to whatever is currently behind it as the page scrolls.
+  const scuffersHeader = document.querySelector(".scuffers-header");
+  const mobileNavDropdown = document.querySelector(".mobile-nav-dropdown");
+
+  if (scuffersHeader) {
+    function getEffectiveBackgroundIsDark(element) {
+      let node = element;
+      while (node && node !== document.documentElement) {
+        const style = getComputedStyle(node);
+
+        if (style.backgroundImage && style.backgroundImage !== "none") {
+          return true;
+        }
+        if (node.tagName === "IMG" || node.tagName === "VIDEO" || node.tagName === "PICTURE") {
+          return true;
+        }
+
+        const match = style.backgroundColor.match(/[\d.]+/g);
+        if (match && match.length >= 3) {
+          const alpha = match.length === 4 ? parseFloat(match[3]) : 1;
+          if (alpha > 0.05) {
+            const [r, g, b] = match.map(Number);
+            const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+            return luminance < 0.55;
+          }
+        }
+
+        node = node.parentElement;
+      }
+      return false;
+    }
+
+    function updateHeaderContrast() {
+      const rect = scuffersHeader.getBoundingClientRect();
+      const probeX = window.innerWidth / 2;
+      const probeY = rect.bottom + 4;
+      const target = document.elementFromPoint(probeX, probeY);
+      if (!target) return;
+
+      const isDark = getEffectiveBackgroundIsDark(target);
+      scuffersHeader.classList.toggle("is-on-dark", isDark);
+      if (mobileNavDropdown) {
+        mobileNavDropdown.classList.toggle("is-on-dark", isDark);
+      }
+    }
+
+    updateHeaderContrast();
+    window.addEventListener("scroll", updateHeaderContrast, { passive: true });
+    window.addEventListener("resize", updateHeaderContrast);
+  }
 });
 </script>
 

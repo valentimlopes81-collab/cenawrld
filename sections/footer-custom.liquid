@@ -48,7 +48,9 @@
   <!-- Social + Copyright -->
   <div class="footer-bottom">
     {% if section.settings.show_country_selector %}
-      {% render 'localization-pill', id: 'footer' %}
+      <div class="footer-localization-mobile-only">
+        {% render 'localization-pill', id: 'footer' %}
+      </div>
     {% endif %}
 
     <div class="footer-social">
@@ -205,6 +207,9 @@
   transform: translateX(-50%);
   text-align: center;
 }
+.footer-localization-mobile-only {
+  display: none;
+}
 .footer-bottom .localization-icon {
   display: inline-flex;
   margin-bottom: 14px;
@@ -230,6 +235,12 @@
 .footer-copyright {
   font-size: 14px;
   color: #777;
+}
+
+@media (max-width: 768px) {
+  .footer-localization-mobile-only {
+    display: block;
+  }
 }
 </style>
 
