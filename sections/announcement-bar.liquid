@@ -1,0 +1,96 @@
+<div class="announcement-bar">
+  <div class="announcement-text">
+    {% assign phrases = section.settings.message | split: " — " %}
+    {% for phrase in phrases %}
+      <span class="announcement-phrase">{{ phrase }}</span>
+    {% endfor %}
+    {% for phrase in phrases %}
+      <span class="announcement-phrase">{{ phrase }}</span>
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+.announcement-bar {
+  background-color: {{ section.settings.bg_color }};
+  color: {{ section.settings.text_color }};
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 6px 0;
+  font-size: 14px;
+  font-weight: 500;
+  position: relative;
+  z-index: 50;
+  text-transform: uppercase;
+}
+
+.announcement-text {
+  display: inline-block;
+  padding-left: 100%; /* início fora da tela */
+  animation: scroll-left {{ section.settings.speed }}s linear infinite;
+  letter-spacing: 1px; 
+}
+
+.announcement-phrase {
+  display: inline-block; /* mantém cada frase inline */
+  margin-right: {{ section.settings.phrase_spacing }}px; /* espaço entre frases */
+}
+  
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%); /* 50% porque duplicamos o conteúdo */
+  }
+}
+</style>
+
+{% schema %}
+{
+  "name": "Barra de anúncio animada",
+  "settings": [
+    {
+      "type": "text",
+      "id": "message",
+      "label": "Mensagem", 
+      "default": "FEEDING THE STREETS ® — STAY OUT OF TROUBLE — SHIPPED IN 24HRS"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Cor de fundo",
+      "default": "#064e3b"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Cor do texto",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "label": "Velocidade da animação (segundos)",
+      "min": 5,
+      "max": 30,
+      "step": 1,
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "phrase_spacing",
+      "label": "Espaço entre frases (px)",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "default": 50
+    }
+  ],
+  "presets": [
+    {
+      "name": "Barra de anúncio animada"
+    }
+  ]
+}
+{% endschema %}

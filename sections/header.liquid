@@ -1,0 +1,400 @@
+<header class="scuffers-header">
+
+  <!-- Header Desktop -->
+  <div class="header-wrapper">
+    
+    <!-- Menu Esquerdo (Homem / Mulher / Coleções) -->
+    <nav class="menu-left">
+      <ul>
+        <li><a href="/collections/homem">Homem</a></li>
+        <li><a href="/collections/mulher">Mulher</a></li>
+        <li><a href="/collections">Coleções</a></li>
+      </ul>
+    </nav>
+
+    <!-- Logo Central (imagem sempre) -->
+    <div class="logo">
+      <a href="{{ routes.root_url }}">
+        <img src="{{ section.settings.logo | image_url: width: 160 }}" alt="{{ shop.name }}" class="site-logo site-logo-desktop">
+      </a>
+    </div>
+
+    <!-- Menu Direito + Ícones -->
+    <div class="header__actions">
+      
+      <!-- Menu Direito (dinâmico configurável) -->
+      <nav class="menu-right">
+        {% if section.settings.menu_right != blank %}
+          <ul>
+            {% for link in linklists[section.settings.menu_right].links %}
+              <li>
+                <a 
+                  href="{{ link.url }}" 
+                  {% if link.title contains 'SALE' %} class="highlight" {% endif %}
+                >
+                  {{ link.title }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </nav>
+
+      <!-- Ícones -->
+      <div class="header__icons">
+        <a href="/search" class="header__icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </a>
+
+        <a href="/account" class="header__icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="7" r="4"></circle>
+            <path d="M2 21c0-5 20-5 20 0"></path>
+          </svg>
+        </a>
+
+        <a href="/cart" class="header__icon cart-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 6h15l-1.5 9h-13z"></path>
+            <circle cx="9" cy="20" r="1"></circle>
+            <circle cx="18" cy="20" r="1"></circle>
+          </svg>
+          <span class="cart-count">{{ cart.item_count }}</span>
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Header Mobile -->
+  <div class="header-mobile">
+    <div class="mobile-left">
+      <!-- Botão Menu (abre sidebar) -->
+      <div class="mobile-menu">
+        <button class="mobile-menu-toggle">
+          <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+          </span>
+        </button>
+      </div>
+
+      <!-- Pesquisa -->
+      <a href="/search" class="header__icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </a>
+    </div>
+
+    <!-- Logo ao centro -->
+    <div class="mobile-logo">
+      <a href="{{ routes.root_url }}">
+        <img src="{{ section.settings.logo | image_url: width: 140 }}" alt="{{ shop.name }}" class="site-logo site-logo-mobile">
+      </a>
+    </div>
+
+    <div class="mobile-right">
+      <!-- Conta -->
+      <a href="/account" class="header__icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="7" r="4"></circle>
+          <path d="M2 21c0-5 20-5 20 0"></path>
+        </svg>
+      </a>
+
+      <!-- Carrinho -->
+      <a href="/cart" class="header__icon cart-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 6h15l-1.5 9h-13z"></path>
+          <circle cx="9" cy="20" r="1"></circle>
+          <circle cx="18" cy="20" r="1"></circle>
+        </svg>
+        <span class="cart-count">{{ cart.item_count }}</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Sidebar Mobile -->
+  <div class="mobile-sidebar">
+    <button class="close-sidebar">✕</button>
+    <ul>
+      <li><a href="/collections/homem">Homem</a></li>
+      <li><a href="/collections/mulher">Mulher</a></li>
+      <li><a href="/collections">Coleções</a></li>
+    </ul>
+  </div>
+
+</header>
+
+<style>
+/* Geral */
+.scuffers-header {
+  width: 100%;
+  border-bottom: 1px solid #eee;
+  padding: 10px 20px;
+  font-family: sans-serif;
+  position: relative;
+}
+.site-logo {
+  width: auto;
+}
+.site-logo-desktop { max-height: 32px; }
+.site-logo-mobile { max-height: 30px; }
+
+@media (max-width: 768px) {
+  .site-logo-desktop { display: none; }
+}
+@media (min-width: 769px) {
+  .site-logo-mobile { display: none; }
+}
+
+/* Desktop Header */
+.header-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+.menu-left, .menu-right { flex: 1; }
+.menu-left ul, .menu-right ul {
+  display: flex;
+  gap: 18px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.menu-left a, .menu-right a,
+.mobile-sidebar a {
+  font-family: sans-serif;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-decoration: none;
+  font-size: 14px;
+  color: #000;
+  letter-spacing: 0.5px;
+  transition: opacity 0.2s ease;
+}
+.menu-left a:hover, .menu-right a:hover, .mobile-sidebar a:hover { opacity: 0.6; }
+.menu-right .highlight {
+  background: yellow;
+  padding: 2px 6px;
+  font-weight: bold;
+}
+
+/* Logo central exato */
+.logo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-left: auto;
+  <!-- Selector de País/Moeda -->
+<div class="header__icon localization-icon">
+  {% form 'localization' %}
+    <button type="button" class="localization-toggle">
+      🇪🇺
+    </button>
+
+    <div class="localization-dropdown">
+      {% if localization.available_countries.size > 1 %}
+        <label>País</label>
+        <select name="country_code" onchange="this.form.submit()">
+          {% for country in localization.available_countries %}
+            <option value="{{ country.iso_code }}" {% if country.iso_code == localization.country.iso_code %}selected{% endif %}>
+              {{ country.name }} ({{ country.currency.iso_code }})
+            </option>
+          {% endfor %}
+        </select>
+      {% endif %}
+
+      {% if localization.available_currencies.size > 1 %}
+        <label>Moeda</label>
+        <select name="currency_code" onchange="this.form.submit()">
+          {% for currency in localization.available_currencies %}
+            <option value="{{ currency.iso_code }}" {% if currency.iso_code == localization.currency.iso_code %}selected{% endif %}>
+              {{ currency.iso_code }}
+            </option>
+          {% endfor %}
+        </select>
+      {% endif %}
+    </div>
+  {% endform %}
+</div>
+}
+
+/* Ícones */
+.header__icons, .mobile-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.header__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: inherit;
+}
+.header__icon svg {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+/* Badge carrinho */
+.cart-icon { position: relative; }
+.cart-count {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  background: black;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  border-radius: 50%;
+  padding: 2px 6px;
+  line-height: 1;
+  min-width: 18px;
+  text-align: center;
+}
+
+/* Mobile Header */
+.header-mobile {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid #eee;
+  position: relative;
+}
+.header-mobile .mobile-left,
+.header-mobile .mobile-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.mobile-logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Hamburger estilo caixa */
+.mobile-menu-toggle {
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 6px;
+  border-radius: 2px;
+  cursor: pointer;
+}
+.hamburger-box {
+  width: 20px;
+  height: 16px;
+  display: inline-block;
+  position: relative;
+}
+.hamburger-inner, 
+.hamburger-inner::before, 
+.hamburger-inner::after {
+  width: 20px;
+  height: 2px;
+  background-color: #000;
+  position: absolute;
+  transition: all 0.3s ease;
+  content: "";
+  left: 0;
+}
+.hamburger-inner { top: 50%; transform: translateY(-50%); }
+.hamburger-inner::before { top: -6px; }
+.hamburger-inner::after { top: 6px; }
+
+/* Sidebar mobile */
+.mobile-sidebar {
+  position: fixed;
+  top: 0;
+  left: -100%;
+  width: 75%;
+  height: 100%;
+  background: white;
+  border-right: 1px solid #ddd;
+  padding: 20px;
+  transition: left 0.3s ease;
+  z-index: 100;
+}
+.mobile-sidebar.active { left: 0; }
+.mobile-sidebar .close-sidebar {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+.mobile-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.mobile-sidebar li { margin-bottom: 16px; }
+
+/* Responsividade */
+@media (min-width: 769px) {
+  .header-wrapper { display: flex; }
+  .header-mobile { display: none; }
+}
+@media (max-width: 768px) {
+  .header-wrapper { display: none; }
+  .header-mobile { display: flex; }
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const toggle = document.querySelector(".mobile-menu-toggle");
+  const sidebar = document.querySelector(".mobile-sidebar");
+  const closeBtn = document.querySelector(".close-sidebar");
+  const links = sidebar.querySelectorAll("a");
+
+  toggle.addEventListener("click", () => {
+    sidebar.classList.add("active");
+  });
+
+  closeBtn.addEventListener("click", () => {
+    sidebar.classList.remove("active");
+  });
+
+  links.forEach(link => {
+    link.addEventListener("click", () => {
+      sidebar.classList.remove("active");
+    });
+  });
+});
+</script>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logotipo"
+    },
+    {
+      "type": "link_list",
+      "id": "menu_right",
+      "label": "Menu Direito"
+    }
+  ]
+}
+{% endschema %}
