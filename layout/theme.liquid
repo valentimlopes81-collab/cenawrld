@@ -91,6 +91,26 @@
       })();
     </script>
 
+    <script>
+      // Measures the floating custom header so page content (and the
+      // homepage hero) can offset correctly without a layout jump.
+      (function setCenaHeaderHeights() {
+        var headerGroup = document.querySelector('#header-group');
+        var navHeader = document.querySelector('.scuffers-header');
+        if (!headerGroup) return;
+
+        function update() {
+          document.documentElement.style.setProperty('--cena-header-total-height', headerGroup.offsetHeight + 'px');
+          if (navHeader) {
+            document.documentElement.style.setProperty('--cena-nav-height', navHeader.offsetHeight + 'px');
+          }
+        }
+
+        update();
+        window.addEventListener('resize', update);
+      })();
+    </script>
+
     <main
       id="MainContent"
       class="content-for-layout"

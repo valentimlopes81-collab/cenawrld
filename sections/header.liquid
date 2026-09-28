@@ -3,9 +3,10 @@
   <!-- Header Desktop -->
   <div class="header-wrapper">
     
-    <!-- Left menu (Men / Women) -->
+    <!-- Left menu (Shop All / Men / Women) -->
     <nav class="menu-left">
       <ul>
+        <li><a href="{{ routes.all_products_collection_url }}">Shop All</a></li>
         <li><a href="/collections/homem">Men</a></li>
         <li><a href="/collections/mulher">Women</a></li>
       </ul>
@@ -153,6 +154,7 @@
   <div class="mobile-sidebar">
     <button class="close-sidebar">✕</button>
     <ul>
+      <li><a href="{{ routes.all_products_collection_url }}">Shop All</a></li>
       <li><a href="/collections/homem">Men</a></li>
       <li><a href="/collections/mulher">Women</a></li>
     </ul>
@@ -162,12 +164,31 @@
 
 <style>
 /* General */
+#header-group {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--layer-sticky, 8);
+}
+
+#MainContent {
+  padding-top: var(--cena-header-total-height, 96px);
+}
+
+#MainContent > .hero-wrapper:first-child {
+  margin-top: calc(-1 * var(--cena-nav-height, 64px));
+}
+
 .scuffers-header {
   width: 100%;
-  border-bottom: 1px solid #eee;
   padding: 10px 20px;
   font-family: sans-serif;
   position: relative;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
 }
 .site-logo {
   width: auto;
@@ -320,7 +341,6 @@
   align-items: center;
   justify-content: space-between;
   padding: 10px 16px;
-  border-bottom: 1px solid #eee;
   position: relative;
 }
 .header-mobile .mobile-left,
