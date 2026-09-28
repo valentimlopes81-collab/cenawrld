@@ -15,7 +15,7 @@
     <!-- Center logo (always an image) -->
     <div class="logo">
       <a href="{{ routes.root_url }}">
-        <img src="{{ section.settings.logo | image_url: width: 160 }}" alt="{{ shop.name }}" class="site-logo site-logo-desktop">
+        <img src="{{ 'cena-logo.png' | asset_url }}" alt="{{ shop.name }}" class="site-logo site-logo-desktop">
       </a>
     </div>
 
@@ -95,7 +95,7 @@
     <!-- Center logo -->
     <div class="mobile-logo">
       <a href="{{ routes.root_url }}">
-        <img src="{{ section.settings.logo | image_url: width: 140 }}" alt="{{ shop.name }}" class="site-logo site-logo-mobile">
+        <img src="{{ 'cena-logo.png' | asset_url }}" alt="{{ shop.name }}" class="site-logo site-logo-mobile">
       </a>
     </div>
 
@@ -474,11 +474,6 @@ document.addEventListener("DOMContentLoaded", function() {
 {
   "name": "Header",
   "settings": [
-    {
-      "type": "image_picker",
-      "id": "logo",
-      "label": "Logo"
-    },
     {
       "type": "link_list",
       "id": "menu_right",
