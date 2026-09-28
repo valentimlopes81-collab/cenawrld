@@ -154,6 +154,15 @@
   --header-fg: #fff;
   background: rgba(0, 0, 0, 0.4);
 }
+.scuffers-header a,
+.scuffers-header button {
+  -webkit-tap-highlight-color: transparent;
+}
+.scuffers-header a:focus-visible,
+.scuffers-header button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
 .site-logo {
   width: auto;
   filter: brightness(0);
@@ -376,6 +385,12 @@
   padding: 6px;
   border-radius: 2px;
   cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.mobile-menu-toggle:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
 }
 .hamburger-box {
   width: 20px;
@@ -444,6 +459,7 @@
   font-size: 16px;
   color: inherit;
   letter-spacing: 0.5px;
+  -webkit-tap-highlight-color: transparent;
 }
 
 @media (min-width: 769px) {
