@@ -3,7 +3,7 @@ import { ZoomDialog } from './zoom-dialog.js';
 
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 5;
-const DEFAULT_ZOOM = 1.5;
+const DEFAULT_ZOOM = 1;
 const DOUBLE_TAP_DELAY = 300;
 const DOUBLE_TAP_DISTANCE = 50;
 const DRAG_THRESHOLD = 10;
