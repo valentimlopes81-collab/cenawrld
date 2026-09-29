@@ -722,22 +722,12 @@ document.addEventListener("DOMContentLoaded", function() {
     const margin = 12;
     const toggleRect = toggle.getBoundingClientRect();
     const dropdownWidth = dropdown.offsetWidth;
-    const dropdownHeight = dropdown.offsetHeight;
 
     let left = toggleRect.right - dropdownWidth;
     left = Math.max(margin, Math.min(left, window.innerWidth - dropdownWidth - margin));
 
-    const spaceBelow = window.innerHeight - toggleRect.bottom;
-    let top;
-    if (spaceBelow < dropdownHeight + margin && toggleRect.top > dropdownHeight + margin) {
-      top = toggleRect.top - dropdownHeight - 8;
-    } else {
-      top = toggleRect.bottom + 8;
-    }
-    top = Math.max(margin, Math.min(top, window.innerHeight - dropdownHeight - margin));
-
     dropdown.style.left = left + "px";
-    dropdown.style.top = top + "px";
+    dropdown.style.top = (toggleRect.bottom + 8) + "px";
   }
 
   const localizationInstances = document.querySelectorAll("[data-localization-instance]");
