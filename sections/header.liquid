@@ -736,6 +736,16 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     top = Math.max(margin, Math.min(top, window.innerHeight - dropdownHeight - margin));
 
+    // .scuffers-header has a backdrop-filter, which makes it the containing
+    // block for its fixed-position descendants: coordinates must be relative
+    // to it (not the viewport) whenever the dropdown lives inside it.
+    const filteredAncestor = dropdown.closest(".scuffers-header");
+    if (filteredAncestor) {
+      const ancestorRect = filteredAncestor.getBoundingClientRect();
+      left -= ancestorRect.left;
+      top -= ancestorRect.top;
+    }
+
     dropdown.style.left = left + "px";
     dropdown.style.top = top + "px";
   }
