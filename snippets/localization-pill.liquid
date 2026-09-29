@@ -4,18 +4,38 @@
   with its flag, name and currency, plus a search field to filter it.
 
   @param {string} id - A unique suffix so multiple instances (desktop/mobile) don't collide.
+  @param {boolean} compact - Shows only the flag + currency symbol on the trigger (no code, no caret), to save space. The dropdown itself is unaffected.
 {%- enddoc -%}
 
 {%- assign localization_form_id = 'localization-form-' | append: id -%}
+{%- assign currency_symbol = localization.country.currency.iso_code -%}
+{%- case localization.country.currency.iso_code -%}
+  {%- when 'EUR' -%}{%- assign currency_symbol = '€' -%}
+  {%- when 'USD' -%}{%- assign currency_symbol = '$' -%}
+  {%- when 'GBP' -%}{%- assign currency_symbol = '£' -%}
+  {%- when 'CAD' -%}{%- assign currency_symbol = 'CA$' -%}
+  {%- when 'MXN' -%}{%- assign currency_symbol = 'MX$' -%}
+  {%- when 'BRL' -%}{%- assign currency_symbol = 'R$' -%}
+  {%- when 'ARS' -%}{%- assign currency_symbol = 'AR$' -%}
+  {%- when 'CLP' -%}{%- assign currency_symbol = 'CL$' -%}
+  {%- when 'COP' -%}{%- assign currency_symbol = 'COL$' -%}
+  {%- when 'CNY' -%}{%- assign currency_symbol = '¥' -%}
+  {%- when 'JPY' -%}{%- assign currency_symbol = '¥' -%}
+{%- endcase -%}
+
 <div class="header__icon localization-icon" data-localization-instance="{{ id }}">
   {% form 'localization', id: localization_form_id %}
-    <button type="button" class="localization-toggle" aria-label="Country and currency" aria-expanded="false">
+    <button type="button" class="localization-toggle{% if compact %} localization-toggle--compact{% endif %}" aria-label="Country and currency" aria-expanded="false">
       <span
         class="localization-flag"
         style="background-image: url({{ localization.country | image_url: width: 32 }});"
       ></span>
-      <span class="localization-currency">{{ localization.country.currency.iso_code }}</span>
-      <span class="localization-caret">{{ 'icon-caret.svg' | inline_asset_content }}</span>
+      {% if compact %}
+        <span class="localization-currency-symbol">{{ currency_symbol }}</span>
+      {% else %}
+        <span class="localization-currency">{{ localization.country.currency.iso_code }}</span>
+        <span class="localization-caret">{{ 'icon-caret.svg' | inline_asset_content }}</span>
+      {% endif %}
     </button>
 
     {% if localization.available_countries.size > 1 %}

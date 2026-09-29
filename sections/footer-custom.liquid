@@ -69,14 +69,7 @@
         </a>
       {% endif %}
     </div>
-    <div class="footer-copyright-row">
-      <p class="footer-copyright">{{ section.settings.copyright }}</p>
-      {% if section.settings.show_country_selector %}
-        <div class="footer-localization-mobile-only">
-          {% render 'localization-pill', id: 'footer' %}
-        </div>
-      {% endif %}
-    </div>
+    <p class="footer-copyright">{{ section.settings.copyright }}</p>
   </div>
 </div>
 
@@ -208,17 +201,6 @@
   transform: translateX(-50%);
   text-align: center;
 }
-.footer-localization-mobile-only {
-  display: none;
-}
-.footer-bottom .localization-icon {
-  display: inline-flex;
-}
-.footer-bottom .localization-dropdown {
-  left: 50%;
-  right: auto;
-  transform: translateX(-50%);
-}
 .footer-social {
   display: flex;
   justify-content: center;
@@ -232,31 +214,11 @@
 .footer-social a:hover {
   opacity: 0.6;
 }
-.footer-copyright-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  line-height: 1;
-}
 .footer-copyright {
   font-size: 14px;
   color: #777;
   margin: 0;
   line-height: 1;
-}
-.footer-copyright-row .localization-icon {
-  margin: 0;
-}
-.footer-copyright-row .localization-toggle {
-  line-height: 1;
-}
-
-@media (max-width: 768px) {
-  .footer-localization-mobile-only {
-    display: inline-flex;
-  }
 }
 </style>
 
