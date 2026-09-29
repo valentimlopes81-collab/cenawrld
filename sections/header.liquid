@@ -272,6 +272,10 @@
   background: rgba(255, 255, 255, 0.15);
   border-color: rgba(255, 255, 255, 0.25);
 }
+.scuffers-header.is-on-dark .localization-toggle--compact {
+  background: transparent;
+  border-color: transparent;
+}
 .localization-flag {
   width: 16px;
   height: 16px;
@@ -294,11 +298,17 @@
   height: 100%;
 }
 .localization-toggle--compact {
-  gap: 4px;
-  padding: 5px 8px;
+  gap: 3px;
+  padding: 4px 6px;
+  background: transparent;
+  border-color: transparent;
+}
+.localization-toggle--compact .localization-flag {
+  width: 15px;
+  height: 15px;
 }
 .localization-currency-symbol {
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1;
 }
 .localization-dropdown {
@@ -468,10 +478,15 @@
 .header-mobile .mobile-right {
   display: flex;
   align-items: center;
+  flex: 1;
   gap: 18px;
 }
 .header-mobile .mobile-left {
   gap: 10px;
+}
+.header-mobile .mobile-right {
+  gap: 10px;
+  justify-content: flex-end;
 }
 .mobile-logo {
   position: absolute;
