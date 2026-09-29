@@ -276,6 +276,26 @@
     },
     {
       "type": "header",
+      "content": "Photo caption"
+    },
+    {
+      "type": "text",
+      "id": "caption_text",
+      "label": "Caption text (e.g. model height/size)",
+      "info": "Shown as a small overlay in the bottom corner of one photo. Leave blank to show nothing. It never appears in the zoomed/full-screen view."
+    },
+    {
+      "type": "range",
+      "id": "caption_image_index",
+      "label": "Which photo gets the caption",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 2,
+      "visible_if": "{{ block.settings.caption_text != blank }}"
+    },
+    {
+      "type": "header",
       "content": "t:content.padding"
     },
     {

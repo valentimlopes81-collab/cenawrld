@@ -336,6 +336,9 @@
           {% else %}
             {%- render 'product-media', media: media, sizes: media_sizes, is_main_product_media: forloop.first -%}
           {% endif %}
+          {% if block_settings.caption_text != blank and forloop.index == block_settings.caption_image_index %}
+            <p class="product-media-caption">{{ block_settings.caption_text }}</p>
+          {% endif %}
         {% endcapture %}
         {% capture class %}
           {{ product_media_container_class }} product-media-container--{{ media.media_type }}{% if block_settings.zoom %} product-media-container--zoomable{% endif %}{% if forloop.index0 == lowest_aspect_ratio_index and block_settings.aspect_ratio == 'adapt' %} product-media-container--tallest{% endif %}
@@ -596,6 +599,21 @@
 {% endif %}
 
 {% stylesheet %}
+  .product-media-caption {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    z-index: 2;
+    margin: 0;
+    padding: 6px 10px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    font-size: 12px;
+    line-height: 1.3;
+    border-radius: 4px;
+    pointer-events: none;
+  }
+
   .dialog-zoomed-gallery {
     cursor: zoom-out;
   }
