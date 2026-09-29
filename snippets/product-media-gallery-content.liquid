@@ -677,16 +677,21 @@
 
   .product-media-caption {
     position: absolute;
-    bottom: 16px;
-    left: 16px;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 2;
     margin: 0;
-    padding: 6px 10px;
-    background: rgba(0, 0, 0, 0.6);
-    color: #fff;
-    font-size: 12px;
+    padding: 4px 12px;
+    background: rgba(0, 0, 0, 0.22);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 10px;
+    letter-spacing: 0.3px;
     line-height: 1.3;
-    border-radius: 4px;
+    white-space: nowrap;
+    border-radius: 999px;
     pointer-events: none;
   }
 
