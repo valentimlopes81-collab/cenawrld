@@ -294,16 +294,12 @@
 .localization-dropdown {
   display: none;
   flex-direction: column;
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 12px;
-  min-width: 260px;
-  max-width: 300px;
-  max-height: 360px;
+  position: fixed;
+  width: min(280px, calc(100vw - 24px));
+  max-height: min(360px, calc(100vh - 24px));
   border-radius: 16px;
   overflow: hidden;
-  z-index: 60;
+  z-index: var(--layer-overlay, 16);
   background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
@@ -328,13 +324,23 @@
   border-color: rgba(255, 255, 255, 0.15);
 }
 .localization-search-input {
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+  display: block;
   width: 100%;
   border: none;
-  background: transparent;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.06);
+  padding: 8px 10px;
   font-size: 13px;
   outline: none;
   color: inherit;
   font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.scuffers-header.is-on-dark .localization-search-input {
+  background: rgba(255, 255, 255, 0.1);
 }
 .localization-search-input::placeholder {
   color: currentColor;
@@ -345,6 +351,24 @@
   margin: 0;
   padding: 6px;
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
+}
+.scuffers-header.is-on-dark .localization-list {
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+.localization-list::-webkit-scrollbar {
+  width: 6px;
+}
+.localization-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.localization-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 999px;
+}
+.scuffers-header.is-on-dark .localization-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
 }
 .localization-list__item.is-hidden {
   display: none;
@@ -405,18 +429,11 @@
   opacity: 0.6;
 }
 
-/* Mobile footer instance: matches the footer's white background and opens upward */
+/* Footer instance: matches the footer's white background instead of the header's glass */
 [data-localization-instance="footer"] .localization-dropdown {
   background: #fff;
   border: 1px solid #eee;
   color: #000;
-  top: auto;
-  bottom: 100%;
-  left: 50%;
-  right: auto;
-  transform: translateX(-50%);
-  margin-top: 0;
-  margin-bottom: 12px;
 }
 
 /* Cart badge */
@@ -701,6 +718,28 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 
+  function positionLocalizationDropdown(toggle, dropdown) {
+    const margin = 12;
+    const toggleRect = toggle.getBoundingClientRect();
+    const dropdownWidth = dropdown.offsetWidth;
+    const dropdownHeight = dropdown.offsetHeight;
+
+    let left = toggleRect.right - dropdownWidth;
+    left = Math.max(margin, Math.min(left, window.innerWidth - dropdownWidth - margin));
+
+    const spaceBelow = window.innerHeight - toggleRect.bottom;
+    let top;
+    if (spaceBelow < dropdownHeight + margin && toggleRect.top > dropdownHeight + margin) {
+      top = toggleRect.top - dropdownHeight - 8;
+    } else {
+      top = toggleRect.bottom + 8;
+    }
+    top = Math.max(margin, Math.min(top, window.innerHeight - dropdownHeight - margin));
+
+    dropdown.style.left = left + "px";
+    dropdown.style.top = top + "px";
+  }
+
   const localizationInstances = document.querySelectorAll("[data-localization-instance]");
 
   localizationInstances.forEach((instance) => {
@@ -714,6 +753,7 @@ document.addEventListener("DOMContentLoaded", function() {
       const isOpen = localizationDropdown.classList.toggle("active");
       localizationToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
       if (isOpen) {
+        positionLocalizationDropdown(localizationToggle, localizationDropdown);
         const searchInput = instance.querySelector("[data-localization-search]");
         if (searchInput) {
           searchInput.value = "";
@@ -724,6 +764,12 @@ document.addEventListener("DOMContentLoaded", function() {
           if (emptyMessage) emptyMessage.hidden = true;
           window.requestAnimationFrame(() => searchInput.focus());
         }
+      }
+    });
+
+    window.addEventListener("resize", () => {
+      if (localizationDropdown.classList.contains("active")) {
+        positionLocalizationDropdown(localizationToggle, localizationDropdown);
       }
     });
 
