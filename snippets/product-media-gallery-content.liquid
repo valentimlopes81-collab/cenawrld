@@ -299,6 +299,30 @@
     {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-image' }}
   </div>
 {% else %}
+  {% liquid
+    assign has_scroll_rail = false
+    if media_presentation == 'grid' and block_settings.show_scroll_thumbnails and sorted_media.size > 1
+      assign has_scroll_rail = true
+    endif
+  %}
+  {% if has_scroll_rail %}
+    <div class="media-gallery-with-rail">
+      <div class="media-gallery__scroll-rail">
+        {% for media in sorted_media %}
+          <a
+            href="#media-gallery-item-{{ block_id }}-{{ forloop.index0 }}"
+            class="media-gallery__scroll-rail-thumb"
+            aria-label="{{ 'accessibility.scroll_to' | t: title: media.alt | default: media.media_type }}"
+          >
+            {{
+              media.preview_image
+              | image_url: width: 160
+              | image_tag: loading: 'lazy', sizes: '48px', widths: '48, 96'
+            }}
+          </a>
+        {% endfor %}
+      </div>
+  {% endif %}
   <media-gallery
     class="
       spacing-style
@@ -412,32 +436,10 @@
     %}
 
     {% if media_presentation == 'grid' %}
-      {% assign has_scroll_rail = false %}
-      {% if block_settings.show_scroll_thumbnails and sorted_media.size > 1 %}
-        {% assign has_scroll_rail = true %}
-      {% endif %}
-      <div class="media-gallery__grid-layout{% if has_scroll_rail %} media-gallery__grid-layout--with-rail{% endif %}">
-        {% if has_scroll_rail %}
-          <div class="media-gallery__scroll-rail">
-            {% for media in sorted_media %}
-              <a
-                href="#media-gallery-item-{{ block_id }}-{{ forloop.index0 }}"
-                class="media-gallery__scroll-rail-thumb"
-                aria-label="{{ 'accessibility.scroll_to' | t: title: media.alt | default: media.media_type }}"
-              >
-                {{
-                  media.preview_image
-                  | image_url: width: 160
-                  | image_tag: loading: 'lazy', sizes: '48px', widths: '48, 96'
-                }}
-              </a>
-            {% endfor %}
-          </div>
-        {% endif %}
-        <ul
-          class="media-gallery__grid list-unstyled"
-          data-testid="media-gallery-grid"
-        >
+      <ul
+        class="media-gallery__grid list-unstyled"
+        data-testid="media-gallery-grid"
+      >
         {% for media in sorted_media %}
           <li
             id="media-gallery-item-{{ block_id }}-{{ forloop.index0 }}"
@@ -474,8 +476,7 @@
             {% endif %}
           </li>
         {% endfor %}
-        </ul>
-      </div>
+      </ul>
     {% endif %}
 
     {%- if block_settings.zoom -%}
@@ -620,6 +621,9 @@
       </script>
     {%- endif -%}
   </media-gallery>
+  {% if has_scroll_rail %}
+    </div>
+  {% endif %}
 {% endif %}
 
 {% stylesheet %}
@@ -638,13 +642,13 @@
     pointer-events: none;
   }
 
-  .media-gallery__grid-layout--with-rail {
+  .media-gallery-with-rail {
     display: flex;
     align-items: flex-start;
     gap: 12px;
   }
 
-  .media-gallery__grid-layout--with-rail .media-gallery__grid {
+  .media-gallery-with-rail media-gallery {
     flex: 1;
     min-width: 0;
   }
