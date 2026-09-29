@@ -1,13 +1,14 @@
 {%- doc -%}
   Renders a compact country/currency pill (flag + currency code + caret)
-  that opens a dropdown with the country and currency selectors.
+  that opens a minimalist custom dropdown listing every available country
+  with its flag, name and currency, plus a search field to filter it.
 
   @param {string} id - A unique suffix so multiple instances (desktop/mobile) don't collide.
 {%- enddoc -%}
 
 <div class="header__icon localization-icon" data-localization-instance="{{ id }}">
   {% form 'localization' %}
-    <button type="button" class="localization-toggle" aria-label="Country and currency">
+    <button type="button" class="localization-toggle" aria-label="Country and currency" aria-expanded="false">
       <span
         class="localization-flag"
         style="background-image: url({{ localization.country | image_url: width: 32 }});"
@@ -16,28 +17,38 @@
       <span class="localization-caret">{{ 'icon-caret.svg' | inline_asset_content }}</span>
     </button>
 
-    <div class="localization-dropdown">
-      {% if localization.available_countries.size > 1 %}
-        <label>Country</label>
-        <select name="country_code" onchange="this.form.submit()">
-          {% for country in localization.available_countries %}
-            <option value="{{ country.iso_code }}" {% if country.iso_code == localization.country.iso_code %}selected{% endif %}>
-              {{ country.name }} ({{ country.currency.iso_code }})
-            </option>
-          {% endfor %}
-        </select>
-      {% endif %}
+    {% if localization.available_countries.size > 1 %}
+      <div class="localization-dropdown">
+        <div class="localization-search">
+          <input
+            type="text"
+            class="localization-search-input"
+            placeholder="Search country"
+            autocomplete="off"
+            data-localization-search
+          >
+        </div>
 
-      {% if localization.available_currencies.size > 1 %}
-        <label>Currency</label>
-        <select name="currency_code" onchange="this.form.submit()">
-          {% for currency in localization.available_currencies %}
-            <option value="{{ currency.iso_code }}" {% if currency.iso_code == localization.currency.iso_code %}selected{% endif %}>
-              {{ currency.iso_code }}
-            </option>
+        <ul class="localization-list" data-localization-list>
+          {% for country in localization.available_countries %}
+            <li
+              class="localization-list__item{% if country.iso_code == localization.country.iso_code %} is-active{% endif %}"
+              data-country-name="{{ country.name | downcase }}"
+            >
+              <button type="submit" name="country_code" value="{{ country.iso_code }}" class="localization-list__button">
+                <span
+                  class="localization-list__flag"
+                  style="background-image: url({{ country | image_url: width: 32 }});"
+                ></span>
+                <span class="localization-list__name">{{ country.name }}</span>
+                <span class="localization-list__currency">{{ country.currency.iso_code }}</span>
+              </button>
+            </li>
           {% endfor %}
-        </select>
-      {% endif %}
-    </div>
+        </ul>
+
+        <p class="localization-empty" data-localization-empty hidden>No matches</p>
+      </div>
+    {% endif %}
   {% endform %}
 </div>

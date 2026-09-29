@@ -293,37 +293,130 @@
 }
 .localization-dropdown {
   display: none;
+  flex-direction: column;
   position: absolute;
   top: 100%;
   right: 0;
   margin-top: 12px;
-  background: #fff;
-  border: 1px solid #eee;
-  border-radius: 4px;
-  padding: 12px;
-  min-width: 180px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  min-width: 260px;
+  max-width: 300px;
+  max-height: 360px;
+  border-radius: 16px;
+  overflow: hidden;
   z-index: 60;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  color: #000;
+}
+.scuffers-header.is-on-dark .localization-dropdown {
+  background: rgba(0, 0, 0, 0.55);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #fff;
 }
 .localization-dropdown.active {
-  display: block;
+  display: flex;
 }
-.localization-dropdown label {
-  display: block;
-  font-size: 11px;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 4px;
+.localization-search {
+  flex-shrink: 0;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
-.localization-dropdown select {
+.scuffers-header.is-on-dark .localization-search {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+.localization-search-input {
   width: 100%;
-  padding: 6px;
-  margin-bottom: 12px;
+  border: none;
+  background: transparent;
   font-size: 13px;
+  outline: none;
+  color: inherit;
+  font-family: inherit;
 }
-.localization-dropdown select:last-child {
-  margin-bottom: 0;
+.localization-search-input::placeholder {
+  color: currentColor;
+  opacity: 0.5;
+}
+.localization-list {
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  overflow-y: auto;
+}
+.localization-list__item.is-hidden {
+  display: none;
+}
+.localization-list__button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 13px;
+  color: inherit;
+  text-align: left;
+  font-family: inherit;
+}
+.localization-list__button:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+.scuffers-header.is-on-dark .localization-list__button:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+.localization-list__item.is-active .localization-list__button {
+  background: rgba(0, 0, 0, 0.08);
+  font-weight: bold;
+}
+.scuffers-header.is-on-dark .localization-list__item.is-active .localization-list__button {
+  background: rgba(255, 255, 255, 0.18);
+}
+.localization-list__flag {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+}
+.localization-list__name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.localization-list__currency {
+  opacity: 0.6;
+  font-size: 11px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+.localization-empty {
+  margin: 0;
+  padding: 16px;
+  font-size: 12px;
+  text-align: center;
+  opacity: 0.6;
+}
+
+/* Mobile footer instance: matches the footer's white background and opens upward */
+[data-localization-instance="footer"] .localization-dropdown {
+  background: #fff;
+  border: 1px solid #eee;
+  color: #000;
+  top: auto;
+  bottom: 100%;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+  margin-top: 0;
+  margin-bottom: 12px;
 }
 
 /* Cart badge */
@@ -618,14 +711,48 @@ document.addEventListener("DOMContentLoaded", function() {
 
     localizationToggle.addEventListener("click", (event) => {
       event.stopPropagation();
-      localizationDropdown.classList.toggle("active");
+      const isOpen = localizationDropdown.classList.toggle("active");
+      localizationToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      if (isOpen) {
+        const searchInput = instance.querySelector("[data-localization-search]");
+        if (searchInput) {
+          searchInput.value = "";
+          instance.querySelectorAll("[data-localization-list] .localization-list__item").forEach((item) => {
+            item.classList.remove("is-hidden");
+          });
+          const emptyMessage = instance.querySelector("[data-localization-empty]");
+          if (emptyMessage) emptyMessage.hidden = true;
+          window.requestAnimationFrame(() => searchInput.focus());
+        }
+      }
     });
 
     document.addEventListener("click", (event) => {
       if (!instance.contains(event.target)) {
         localizationDropdown.classList.remove("active");
+        localizationToggle.setAttribute("aria-expanded", "false");
       }
     });
+
+    const searchInput = instance.querySelector("[data-localization-search]");
+    const listItems = instance.querySelectorAll("[data-localization-list] .localization-list__item");
+    const emptyMessage = instance.querySelector("[data-localization-empty]");
+
+    if (searchInput && listItems.length) {
+      searchInput.addEventListener("click", (event) => event.stopPropagation());
+      searchInput.addEventListener("input", () => {
+        const query = searchInput.value.trim().toLowerCase();
+        let visibleCount = 0;
+
+        listItems.forEach((item) => {
+          const matches = item.dataset.countryName.indexOf(query) !== -1;
+          item.classList.toggle("is-hidden", !matches);
+          if (matches) visibleCount += 1;
+        });
+
+        if (emptyMessage) emptyMessage.hidden = visibleCount !== 0;
+      });
+    }
   });
 
   // Adapts the floating header's colors (logo, text, icons, glass tint)
