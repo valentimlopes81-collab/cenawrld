@@ -307,7 +307,7 @@
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
   color: #000;
 }
-.scuffers-header.is-on-dark .localization-dropdown {
+.localization-dropdown.is-on-dark {
   background: rgba(0, 0, 0, 0.55);
   border-color: rgba(255, 255, 255, 0.15);
   color: #fff;
@@ -320,7 +320,7 @@
   padding: 10px 14px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
-.scuffers-header.is-on-dark .localization-search {
+.localization-dropdown.is-on-dark .localization-search {
   border-color: rgba(255, 255, 255, 0.15);
 }
 .localization-search-input {
@@ -339,7 +339,7 @@
   font-family: inherit;
   -webkit-tap-highlight-color: transparent;
 }
-.scuffers-header.is-on-dark .localization-search-input {
+.localization-dropdown.is-on-dark .localization-search-input {
   background: rgba(255, 255, 255, 0.1);
 }
 .localization-search-input::placeholder {
@@ -354,7 +354,7 @@
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
 }
-.scuffers-header.is-on-dark .localization-list {
+.localization-dropdown.is-on-dark .localization-list {
   scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
 }
 .localization-list::-webkit-scrollbar {
@@ -367,7 +367,7 @@
   background: rgba(0, 0, 0, 0.25);
   border-radius: 999px;
 }
-.scuffers-header.is-on-dark .localization-list::-webkit-scrollbar-thumb {
+.localization-dropdown.is-on-dark .localization-list::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.3);
 }
 .localization-list__item.is-hidden {
@@ -391,14 +391,14 @@
 .localization-list__button:hover {
   background: rgba(0, 0, 0, 0.06);
 }
-.scuffers-header.is-on-dark .localization-list__button:hover {
+.localization-dropdown.is-on-dark .localization-list__button:hover {
   background: rgba(255, 255, 255, 0.12);
 }
 .localization-list__item.is-active .localization-list__button {
   background: rgba(0, 0, 0, 0.08);
   font-weight: bold;
 }
-.scuffers-header.is-on-dark .localization-list__item.is-active .localization-list__button {
+.localization-dropdown.is-on-dark .localization-list__item.is-active .localization-list__button {
   background: rgba(255, 255, 255, 0.18);
 }
 .localization-list__flag {
@@ -430,7 +430,7 @@
 }
 
 /* Footer instance: matches the footer's white background instead of the header's glass */
-[data-localization-instance="footer"] .localization-dropdown {
+.localization-dropdown[data-instance="footer"] {
   background: #fff;
   border: 1px solid #eee;
   color: #000;
@@ -736,16 +736,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     top = Math.max(margin, Math.min(top, window.innerHeight - dropdownHeight - margin));
 
-    // .scuffers-header has a backdrop-filter, which makes it the containing
-    // block for its fixed-position descendants: coordinates must be relative
-    // to it (not the viewport) whenever the dropdown lives inside it.
-    const filteredAncestor = dropdown.closest(".scuffers-header");
-    if (filteredAncestor) {
-      const ancestorRect = filteredAncestor.getBoundingClientRect();
-      left -= ancestorRect.left;
-      top -= ancestorRect.top;
-    }
-
     dropdown.style.left = left + "px";
     dropdown.style.top = top + "px";
   }
@@ -758,19 +748,27 @@ document.addEventListener("DOMContentLoaded", function() {
 
     if (!localizationToggle || !localizationDropdown) return;
 
+    // .scuffers-header (and any similar glass container) has a backdrop-filter,
+    // which makes it the containing block for fixed-position descendants.
+    // Moving the dropdown to <body> guarantees position: fixed is always
+    // relative to the real viewport, regardless of where the toggle lives.
+    document.body.appendChild(localizationDropdown);
+
     localizationToggle.addEventListener("click", (event) => {
       event.stopPropagation();
       const isOpen = localizationDropdown.classList.toggle("active");
       localizationToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
       if (isOpen) {
+        const scuffersHeader = document.querySelector(".scuffers-header");
+        localizationDropdown.classList.toggle("is-on-dark", !!(scuffersHeader && scuffersHeader.classList.contains("is-on-dark")));
         positionLocalizationDropdown(localizationToggle, localizationDropdown);
-        const searchInput = instance.querySelector("[data-localization-search]");
+        const searchInput = localizationDropdown.querySelector("[data-localization-search]");
         if (searchInput) {
           searchInput.value = "";
-          instance.querySelectorAll("[data-localization-list] .localization-list__item").forEach((item) => {
+          localizationDropdown.querySelectorAll("[data-localization-list] .localization-list__item").forEach((item) => {
             item.classList.remove("is-hidden");
           });
-          const emptyMessage = instance.querySelector("[data-localization-empty]");
+          const emptyMessage = localizationDropdown.querySelector("[data-localization-empty]");
           if (emptyMessage) emptyMessage.hidden = true;
           window.requestAnimationFrame(() => searchInput.focus());
         }
@@ -784,15 +782,15 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     document.addEventListener("click", (event) => {
-      if (!instance.contains(event.target)) {
+      if (!instance.contains(event.target) && !localizationDropdown.contains(event.target)) {
         localizationDropdown.classList.remove("active");
         localizationToggle.setAttribute("aria-expanded", "false");
       }
     });
 
-    const searchInput = instance.querySelector("[data-localization-search]");
-    const listItems = instance.querySelectorAll("[data-localization-list] .localization-list__item");
-    const emptyMessage = instance.querySelector("[data-localization-empty]");
+    const searchInput = localizationDropdown.querySelector("[data-localization-search]");
+    const listItems = localizationDropdown.querySelectorAll("[data-localization-list] .localization-list__item");
+    const emptyMessage = localizationDropdown.querySelector("[data-localization-empty]");
 
     if (searchInput && listItems.length) {
       searchInput.addEventListener("click", (event) => event.stopPropagation());

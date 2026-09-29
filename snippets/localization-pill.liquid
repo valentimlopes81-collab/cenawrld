@@ -6,8 +6,9 @@
   @param {string} id - A unique suffix so multiple instances (desktop/mobile) don't collide.
 {%- enddoc -%}
 
+{%- assign localization_form_id = 'localization-form-' | append: id -%}
 <div class="header__icon localization-icon" data-localization-instance="{{ id }}">
-  {% form 'localization' %}
+  {% form 'localization', id: localization_form_id %}
     <button type="button" class="localization-toggle" aria-label="Country and currency" aria-expanded="false">
       <span
         class="localization-flag"
@@ -18,7 +19,7 @@
     </button>
 
     {% if localization.available_countries.size > 1 %}
-      <div class="localization-dropdown">
+      <div class="localization-dropdown" data-instance="{{ id }}">
         <div class="localization-search">
           <input
             type="text"
@@ -35,7 +36,7 @@
               class="localization-list__item{% if country.iso_code == localization.country.iso_code %} is-active{% endif %}"
               data-country-name="{{ country.name | downcase }}"
             >
-              <button type="submit" name="country_code" value="{{ country.iso_code }}" class="localization-list__button">
+              <button type="submit" form="{{ localization_form_id }}" name="country_code" value="{{ country.iso_code }}" class="localization-list__button">
                 <span
                   class="localization-list__flag"
                   style="background-image: url({{ country | image_url: width: 32 }});"
