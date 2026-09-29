@@ -549,6 +549,40 @@ main[data-template="product"] :is(button, .button) {
     content: url('{{ "hero-desktop.jpg" | asset_url }}') !important;
   }
 }
+
+/* Shopify's default policy pages (Refund, Shipping, Privacy, Terms):
+   consistent sizing to match the rest of the site's typography. */
+.shopify-policy__container {
+  font-family: var(--font-body--family, sans-serif);
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 60px 20px;
+}
+.shopify-policy__title {
+  font-size: var(--font-size--3xl, 2rem) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 24px !important;
+}
+.shopify-policy__body,
+.shopify-policy__body p,
+.shopify-policy__body li,
+.shopify-policy__body span,
+.shopify-policy__body td {
+  font-size: var(--font-size--md, 1rem) !important;
+  line-height: 1.6;
+}
+.shopify-policy__body h1,
+.shopify-policy__body h2,
+.shopify-policy__body h3,
+.shopify-policy__body h4,
+.shopify-policy__body h5,
+.shopify-policy__body h6 {
+  font-size: var(--font-size--lg, 1.125rem) !important;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-top: 24px;
+}
 </style>
 
 <script>
