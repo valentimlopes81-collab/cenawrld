@@ -2,11 +2,16 @@
   <div class="announcement-bar">
     <div class="announcement-text">
       {% assign phrases = section.settings.message | split: " — " %}
-      {% for phrase in phrases %}
-        <span class="announcement-phrase">{{ phrase }}</span>
-      {% endfor %}
-      {% for phrase in phrases %}
-        <span class="announcement-phrase">{{ phrase }}</span>
+      {%- comment -%}
+        Repeat the phrase set a generous, fixed number of times so the bar
+        is always fully covered edge to edge (even on ultra-wide screens)
+        before the loop even starts, with no empty gap to wait for.
+        Even count keeps the -50% keyframe seamless.
+      {%- endcomment -%}
+      {% for i in (1..16) %}
+        {% for phrase in phrases %}
+          <span class="announcement-phrase">{{ phrase }}</span>
+        {% endfor %}
       {% endfor %}
     </div>
   </div>
