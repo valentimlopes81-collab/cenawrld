@@ -307,11 +307,12 @@
   %}
   {% if has_scroll_rail %}
     <div class="media-gallery-with-rail">
-      <div class="media-gallery__scroll-rail">
+      <div class="media-gallery__scroll-rail" data-rail-id="rail-{{ block_id }}">
         {% for media in sorted_media %}
           <a
             href="#media-gallery-item-{{ block_id }}-{{ forloop.index0 }}"
             class="media-gallery__scroll-rail-thumb"
+            data-rail-target="media-gallery-item-{{ block_id }}-{{ forloop.index0 }}"
             aria-label="{{ 'accessibility.scroll_to' | t: title: media.alt | default: media.media_type }}"
           >
             {{
@@ -489,16 +490,46 @@
           on:keydown="/handleKeyDown"
           scroll-lock
         >
-          <button
-            type="button"
-            class="button button-unstyled close-button dialog-zoomed-gallery__close-button"
-            aria-label="{{ 'actions.close' | t }}"
-            on:click="/close"
-          >
-            <span class="visually-hidden">{{ 'actions.close' | t }}</span>
-            {{ 'icon-close.svg' | inline_asset_content }}
-          </button>
-          <div class="dialog-thumbnails-list-container">
+          {% if sorted_media.size > 1 %}
+            <div class="dialog-zoomed-gallery__nav">
+              <button
+                type="button"
+                class="button button-unstyled dialog-zoomed-gallery__nav-button"
+                aria-label="{{ 'pagination.previous' | t }}"
+                data-zoom-nav="prev"
+              >
+                {{ 'icon-chevron-left.svg' | inline_asset_content }}
+              </button>
+              <button
+                type="button"
+                class="button button-unstyled close-button dialog-zoomed-gallery__close-button"
+                aria-label="{{ 'actions.close' | t }}"
+                on:click="/close"
+              >
+                <span class="visually-hidden">{{ 'actions.close' | t }}</span>
+                {{ 'icon-close.svg' | inline_asset_content }}
+              </button>
+              <button
+                type="button"
+                class="button button-unstyled dialog-zoomed-gallery__nav-button"
+                aria-label="{{ 'pagination.next' | t }}"
+                data-zoom-nav="next"
+              >
+                {{ 'icon-chevron-right.svg' | inline_asset_content }}
+              </button>
+            </div>
+          {% else %}
+            <button
+              type="button"
+              class="button button-unstyled close-button dialog-zoomed-gallery__close-button"
+              aria-label="{{ 'actions.close' | t }}"
+              on:click="/close"
+            >
+              <span class="visually-hidden">{{ 'actions.close' | t }}</span>
+              {{ 'icon-close.svg' | inline_asset_content }}
+            </button>
+          {% endif %}
+          <div class="dialog-thumbnails-list-container dialog-thumbnails-list-container--hidden">
             <scroll-hint
               class="dialog-thumbnails-list list-unstyled"
               ref="thumbnails"
@@ -579,6 +610,33 @@
           </ul>
         </dialog>
       </zoom-dialog>
+      <script>
+        (() => {
+          const zoomDialog = document.getElementById('zoom-dialog-{{ block_id }}');
+          if (!zoomDialog) return;
+
+          zoomDialog.addEventListener('click', (event) => {
+            const navButton = event.target.closest('[data-zoom-nav]');
+            if (!navButton) return;
+
+            const thumbnails = zoomDialog.querySelector('[ref="thumbnails"]');
+            if (!thumbnails) return;
+
+            const buttons = Array.from(thumbnails.querySelectorAll('button'));
+            const currentIndex = buttons.findIndex((button) => button.getAttribute('aria-selected') === 'true');
+            const total = buttons.length;
+            if (total === 0) return;
+
+            const direction = navButton.dataset.zoomNav === 'next' ? 1 : -1;
+            const safeCurrentIndex = currentIndex === -1 ? 0 : currentIndex;
+            const nextIndex = (safeCurrentIndex + direction + total) % total;
+
+            if (typeof zoomDialog.handleThumbnailClick === 'function') {
+              zoomDialog.handleThumbnailClick(nextIndex);
+            }
+          });
+        })();
+      </script>
     {%- endif -%}
 
     {%- if first_3d_model -%}
@@ -623,6 +681,38 @@
   </media-gallery>
   {% if has_scroll_rail %}
     </div>
+    <script>
+      (() => {
+        const rail = document.querySelector('[data-rail-id="rail-{{ block_id }}"]');
+        if (!rail || typeof IntersectionObserver === 'undefined') return;
+
+        const links = Array.from(rail.querySelectorAll('[data-rail-target]'));
+        const targets = links
+          .map((link) => document.getElementById(link.dataset.railTarget))
+          .filter(Boolean);
+
+        if (!targets.length) return;
+
+        const setActive = (id) => {
+          links.forEach((link) => {
+            link.classList.toggle('is-active', link.dataset.railTarget === id);
+          });
+        };
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            const visible = entries
+              .filter((entry) => entry.isIntersecting)
+              .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+            if (visible) setActive(visible.target.id);
+          },
+          { threshold: [0.5, 0.75, 1] }
+        );
+
+        targets.forEach((target) => observer.observe(target));
+      })();
+    </script>
   {% endif %}
 {% endif %}
 
@@ -675,6 +765,10 @@
 
   .media-gallery__scroll-rail-thumb:hover {
     border-color: rgb(var(--color-foreground-rgb) / 0.3);
+  }
+
+  .media-gallery__scroll-rail-thumb.is-active {
+    border-color: var(--color-foreground);
   }
 
   .media-gallery__scroll-rail-thumb img {
@@ -786,6 +880,39 @@
     color: #fff;
     mix-blend-mode: difference;
     z-index: var(--layer-raised);
+  }
+
+  .dialog-zoomed-gallery__nav {
+    position: fixed;
+    bottom: var(--margin-lg, 24px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: var(--layer-raised);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .dialog-zoomed-gallery__nav .dialog-zoomed-gallery__close-button {
+    position: static;
+    top: auto;
+    right: auto;
+  }
+
+  .dialog-zoomed-gallery__nav-button {
+    width: var(--minimum-touch-target);
+    height: var(--minimum-touch-target);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    mix-blend-mode: difference;
+    background: transparent;
+    border-radius: 50%;
+  }
+
+  .dialog-thumbnails-list-container--hidden {
+    display: none;
   }
 
   .media-gallery__mobile-controls {
