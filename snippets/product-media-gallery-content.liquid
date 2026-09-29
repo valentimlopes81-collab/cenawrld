@@ -412,12 +412,35 @@
     %}
 
     {% if media_presentation == 'grid' %}
-      <ul
-        class="media-gallery__grid list-unstyled"
-        data-testid="media-gallery-grid"
-      >
+      {% assign has_scroll_rail = false %}
+      {% if block_settings.show_scroll_thumbnails and sorted_media.size > 1 %}
+        {% assign has_scroll_rail = true %}
+      {% endif %}
+      <div class="media-gallery__grid-layout{% if has_scroll_rail %} media-gallery__grid-layout--with-rail{% endif %}">
+        {% if has_scroll_rail %}
+          <div class="media-gallery__scroll-rail">
+            {% for media in sorted_media %}
+              <a
+                href="#media-gallery-item-{{ block_id }}-{{ forloop.index0 }}"
+                class="media-gallery__scroll-rail-thumb"
+                aria-label="{{ 'accessibility.scroll_to' | t: title: media.alt | default: media.media_type }}"
+              >
+                {{
+                  media.preview_image
+                  | image_url: width: 160
+                  | image_tag: loading: 'lazy', sizes: '48px', widths: '48, 96'
+                }}
+              </a>
+            {% endfor %}
+          </div>
+        {% endif %}
+        <ul
+          class="media-gallery__grid list-unstyled"
+          data-testid="media-gallery-grid"
+        >
         {% for media in sorted_media %}
           <li
+            id="media-gallery-item-{{ block_id }}-{{ forloop.index0 }}"
             ref="media[]"
             class="{{ product_media_container_class }} product-media-container--{{ media.media_type }}"
             style="{% if block_settings.aspect_ratio == 'adapt' %} --media-preview-ratio: {{ media.preview_image.aspect_ratio | default: 1.0 }};{% endif %}"
@@ -451,7 +474,8 @@
             {% endif %}
           </li>
         {% endfor %}
-      </ul>
+        </ul>
+      </div>
     {% endif %}
 
     {%- if block_settings.zoom -%}
@@ -612,6 +636,48 @@
     line-height: 1.3;
     border-radius: 4px;
     pointer-events: none;
+  }
+
+  .media-gallery__grid-layout--with-rail {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .media-gallery__grid-layout--with-rail .media-gallery__grid {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .media-gallery__scroll-rail {
+    position: sticky;
+    top: calc(var(--cena-header-total-height, 96px) + 28px);
+    flex-shrink: 0;
+    width: 56px;
+    max-height: calc(100vh - var(--cena-header-total-height, 96px) - 56px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .media-gallery__scroll-rail-thumb {
+    display: block;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    overflow: hidden;
+    line-height: 0;
+  }
+
+  .media-gallery__scroll-rail-thumb:hover {
+    border-color: rgb(var(--color-foreground-rgb) / 0.3);
+  }
+
+  .media-gallery__scroll-rail-thumb img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
   }
 
   .dialog-zoomed-gallery {

@@ -1,0 +1,74 @@
+{%- liquid
+  assign product_resource = closest.product
+  assign selected_variant = product_resource.selected_or_first_available_variant
+  assign discount_percent = block.settings.discount_percent
+  assign multiplier = 100 | minus: discount_percent | divided_by: 100.0
+  assign discounted_price = selected_variant.price | times: multiplier | round
+-%}
+
+<p class="newsletter-discount-line" {{ block.shopify_attributes }}>
+  {{ block.settings.text_before | default: 'Get it for' }}
+  <strong>{{ discounted_price | money }}</strong>
+  {{ block.settings.text_after | default: 'by' }}
+  <a href="{{ block.settings.link_url | default: '#newsletter' }}">{{ block.settings.link_text | default: 'joining our newsletter now!' }}</a>
+</p>
+
+{% stylesheet %}
+  .newsletter-discount-line {
+    font-size: var(--font-paragraph-small--size, 0.875rem);
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-70, 0.7));
+    margin: 0;
+  }
+
+  .newsletter-discount-line strong {
+    color: var(--color-foreground);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Newsletter discount line",
+  "tag": null,
+  "settings": [
+    {
+      "type": "range",
+      "id": "discount_percent",
+      "label": "Discount percentage",
+      "min": 1,
+      "max": 50,
+      "step": 1,
+      "default": 10
+    },
+    {
+      "type": "text",
+      "id": "text_before",
+      "label": "Text before price",
+      "default": "Get it for"
+    },
+    {
+      "type": "text",
+      "id": "text_after",
+      "label": "Text after price",
+      "default": "by"
+    },
+    {
+      "type": "text",
+      "id": "link_text",
+      "label": "Link text",
+      "default": "joining our newsletter now!"
+    },
+    {
+      "type": "text",
+      "id": "link_url",
+      "label": "Link URL",
+      "default": "#newsletter",
+      "info": "Defaults to the footer newsletter sign-up form."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Newsletter discount line"
+    }
+  ]
+}
+{% endschema %}

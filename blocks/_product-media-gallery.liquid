@@ -69,6 +69,14 @@
       "visible_if": "{{ block.settings.media_presentation == 'grid' and block.settings.media_columns == 'two' }}"
     },
     {
+      "type": "checkbox",
+      "id": "show_scroll_thumbnails",
+      "label": "Show a clickable thumbnail rail while scrolling",
+      "default": false,
+      "info": "Adds a sticky column of small thumbnails next to the stacked photos; clicking one scrolls to that photo.",
+      "visible_if": "{{ block.settings.media_presentation == 'grid' and block.settings.media_columns == 'one' }}"
+    },
+    {
       "type": "header",
       "content": "t:content.carousel"
     },

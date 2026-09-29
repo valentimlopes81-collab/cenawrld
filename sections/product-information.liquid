@@ -357,17 +357,23 @@
     }
   }
 
-  /* Product page redesign: left-aligned title/price, bigger size buttons */
+  /* Product page redesign: left-aligned title/price, full-width size buttons */
   .product-information h2 {
     text-align: left;
+    font-size: var(--font-h4--size);
   }
 
   .product-information product-price {
     text-align: left;
   }
 
+  .product-information .variant-option--buttons {
+    flex-wrap: nowrap;
+  }
+
   .product-information .variant-option__button-label {
-    font-size: 1.1rem;
+    flex: 1 1 0;
+    min-width: 0;
   }
 {% endstylesheet %}
 
