@@ -34,7 +34,7 @@
         <button type="submit">GET 10% OFF <span aria-hidden="true">&rarr;</span></button>
       {% endform %}
 
-      <p class="cena-popup__thanks" data-cena-popup-thanks hidden>Thank you. Check your inbox.</p>
+      <p class="cena-popup__thanks" data-cena-popup-thanks hidden>We've just dropped your discount code in your inbox. Use it on your first order.</p>
     </div>
   </div>
 </div>
@@ -253,7 +253,7 @@
         await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'text/html' } });
         form.hidden = true;
         popup.querySelector('[data-cena-popup-thanks]').hidden = false;
-        setTimeout(close, 2500);
+        setTimeout(close, 6000);
       } catch (err) {
         button.disabled = false;
       }
