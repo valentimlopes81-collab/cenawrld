@@ -311,8 +311,12 @@
         // The phone number is a bonus: if SMS is not available yet, the email signup still counts.
         if (phone) { try { await subscribeSms(email, phone); } catch (err) {} }
         if (response.ok) showSuccess();
-        else showError('Something went wrong. Please try again.');
+        else {
+          console.error('[cena-popup] Klaviyo email signup failed', response.status, await response.text());
+          showError('Something went wrong. Please try again.');
+        }
       } catch (err) {
+        console.error('[cena-popup] Klaviyo request error', err);
         showError('Something went wrong. Please try again.');
       }
     });
