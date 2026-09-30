@@ -1,0 +1,190 @@
+{%- unless request.design_mode or request.page_type == 'password' -%}
+<div class="cena-popup" id="cena-popup" role="dialog" aria-modal="true" aria-labelledby="cena-popup-title" hidden>
+  <div class="cena-popup__card" style="--cena-popup-bg: url('{{ 'popup-bg.jpg' | asset_url }}');">
+    <button type="button" class="cena-popup__close" aria-label="Close" data-cena-popup-close>
+      <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+
+    <div class="cena-popup__content">
+      <h2 class="cena-popup__title" id="cena-popup-title">10% OFF YOUR FIRST ORDER</h2>
+      <p class="cena-popup__text">The drops, before everyone else.</p>
+
+      {% form 'customer', id: 'cena-popup-form', class: 'cena-popup__form' %}
+        <input type="hidden" name="contact[tags]" value="newsletter">
+        <input type="email" name="contact[email]" placeholder="Enter your email" autocomplete="email" required>
+        <button type="submit">GET 10% OFF <span aria-hidden="true">&rarr;</span></button>
+      {% endform %}
+
+      <p class="cena-popup__thanks" data-cena-popup-thanks hidden>Thank you. Check your inbox.</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .cena-popup {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.45);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+  .cena-popup[hidden] { display: none; }
+  .cena-popup.is-open { opacity: 1; }
+
+  .cena-popup__card {
+    position: relative;
+    width: min(560px, 100%);
+    min-height: 340px;
+    border-radius: 28px;
+    overflow: hidden;
+    color: #fff;
+    background:
+      linear-gradient(rgba(0, 0, 0, 0.62), rgba(0, 0, 0, 0.72)),
+      var(--cena-popup-bg) center / cover no-repeat;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    transform: translateY(14px) scale(0.98);
+    transition: transform 0.35s ease;
+  }
+  .cena-popup.is-open .cena-popup__card { transform: none; }
+
+  .cena-popup__content {
+    width: 100%;
+    padding: 48px 40px;
+    text-align: left;
+  }
+
+  .cena-popup__title {
+    margin: 0 0 10px;
+    font-size: clamp(24px, 5vw, 32px);
+    line-height: 1.05;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #fff;
+  }
+
+  .cena-popup__text {
+    margin: 0 0 24px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.82);
+  }
+
+  .cena-popup__form { display: flex; flex-direction: column; gap: 12px; }
+
+  .cena-popup__form input[type='email'],
+  .cena-popup__form button[type='submit'] {
+    box-sizing: border-box;
+  }
+
+  .cena-popup__form input[type='email'] {
+    width: 100%;
+    padding: 16px 20px;
+    font-size: 15px;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 999px;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .cena-popup__form input[type='email']::placeholder { color: rgba(255, 255, 255, 0.65); }
+  .cena-popup__form input[type='email']:focus { border-color: #fff; background: rgba(255, 255, 255, 0.2); }
+
+  .cena-popup__form button[type='submit'] {
+    padding: 16px 20px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    color: #000;
+    background: #fff;
+    border: 0;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+  .cena-popup__form button[type='submit']:hover { opacity: 0.85; }
+
+  .cena-popup__thanks { margin: 16px 0 0; font-size: 14px; font-weight: 600; }
+
+  .cena-popup__close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 2;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  @media (max-width: 480px) {
+    .cena-popup__content { padding: 56px 24px 32px; }
+  }
+</style>
+
+<script>
+  (() => {
+    const popup = document.getElementById('cena-popup');
+    if (!popup) return;
+    const KEY = 'cena_popup_seen';
+    const DELAY = 10000;
+
+    let seen = false;
+    try { seen = !!localStorage.getItem(KEY); } catch (e) {}
+    if (seen) return;
+
+    const markSeen = () => { try { localStorage.setItem(KEY, '1'); } catch (e) {} };
+
+    const close = () => {
+      popup.classList.remove('is-open');
+      setTimeout(() => { popup.hidden = true; }, 350);
+      document.removeEventListener('keydown', onKey);
+    };
+    const onKey = (e) => { if (e.key === 'Escape') close(); };
+
+    const open = () => {
+      popup.hidden = false;
+      requestAnimationFrame(() => popup.classList.add('is-open'));
+      markSeen();
+      document.addEventListener('keydown', onKey);
+    };
+
+    popup.addEventListener('click', (e) => {
+      if (e.target === popup || e.target.closest('[data-cena-popup-close]')) close();
+    });
+
+    const form = popup.querySelector('form');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const button = form.querySelector('button[type="submit"]');
+      button.disabled = true;
+      try {
+        await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'text/html' } });
+        form.hidden = true;
+        popup.querySelector('[data-cena-popup-thanks]').hidden = false;
+        setTimeout(close, 2500);
+      } catch (err) {
+        button.disabled = false;
+      }
+    });
+
+    setTimeout(open, DELAY);
+  })();
+</script>
+{%- endunless -%}
