@@ -57,12 +57,6 @@
 /* Mobile adjustments */
 @media (max-width: 768px) {
   .banner-container {
-    /* same photo as desktop, cropped to the portrait frame and centred on the face */
-    background-image: url('{{ 'banner-desktop.jpg' | asset_url }}') !important;
-    /* photo a bit smaller and anchored to the bottom, so the top of the head clears the floating header; shifted to show more of the right */
-    background-size: auto 95% !important;
-    background-position: 40% 100% !important;
-    background-color: #000;
     min-height: auto; /* let the image control the height */
     aspect-ratio: 9/16; /* keeps a vertical stories-like ratio */
     background-color: black;
