@@ -12,6 +12,25 @@
       {% form 'customer', id: 'cena-popup-form', class: 'cena-popup__form' %}
         <input type="hidden" name="contact[tags]" value="newsletter">
         <input type="email" name="contact[email]" placeholder="Enter your email" autocomplete="email" required>
+        <div class="cena-popup__phone">
+          <select data-cena-popup-code aria-label="Country code">
+            <option value="+351" selected>+351</option>
+            <option value="+34">+34</option>
+            <option value="+33">+33</option>
+            <option value="+44">+44</option>
+            <option value="+49">+49</option>
+            <option value="+39">+39</option>
+            <option value="+31">+31</option>
+            <option value="+32">+32</option>
+            <option value="+41">+41</option>
+            <option value="+353">+353</option>
+            <option value="+55">+55</option>
+            <option value="+1">+1</option>
+          </select>
+          <input type="tel" data-cena-popup-phone placeholder="912 345 678" autocomplete="tel-national" inputmode="tel">
+          <span class="cena-popup__optional">OPTIONAL</span>
+        </div>
+        <input type="hidden" name="contact[note]" value="" data-cena-popup-note>
         <button type="submit">GET 10% OFF <span aria-hidden="true">&rarr;</span></button>
       {% endform %}
 
@@ -114,6 +133,59 @@
   }
   .cena-popup__form button[type='submit']:hover { opacity: 0.85; }
 
+  .cena-popup__phone {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .cena-popup__phone:focus-within { border-color: #fff; background: rgba(255, 255, 255, 0.2); }
+  .cena-popup__phone select {
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    padding: 16px 12px 16px 20px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    background: transparent;
+    border: 0;
+    border-right: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 0;
+    outline: none;
+    cursor: pointer;
+  }
+  .cena-popup__phone select option { color: #000; }
+  .cena-popup__phone input {
+    box-sizing: border-box;
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 16px 12px 16px 16px;
+    font-size: 15px;
+    color: #fff;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .cena-popup__phone input::placeholder { color: rgba(255, 255, 255, 0.55); }
+  .cena-popup__optional {
+    flex: 0 0 auto;
+    margin-right: 12px;
+    padding: 5px 10px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    color: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 8px;
+  }
+
   .cena-popup__thanks { margin: 16px 0 0; font-size: 14px; font-weight: 600; }
 
   .cena-popup__close {
@@ -146,10 +218,10 @@
     const DELAY = 10000;
 
     let seen = false;
-    try { seen = !!localStorage.getItem(KEY); } catch (e) {}
+    try { seen = !!sessionStorage.getItem(KEY); } catch (e) {}
     if (seen) return;
 
-    const markSeen = () => { try { localStorage.setItem(KEY, '1'); } catch (e) {} };
+    const markSeen = () => { try { sessionStorage.setItem(KEY, '1'); } catch (e) {} };
 
     const close = () => {
       popup.classList.remove('is-open');
@@ -172,6 +244,9 @@
     const form = popup.querySelector('form');
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      const phone = form.querySelector('[data-cena-popup-phone]').value.trim();
+      const code = form.querySelector('[data-cena-popup-code]').value;
+      form.querySelector('[data-cena-popup-note]').value = phone ? 'Phone: ' + code + ' ' + phone : '';
       const button = form.querySelector('button[type="submit"]');
       button.disabled = true;
       try {
