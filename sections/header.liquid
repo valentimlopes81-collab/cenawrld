@@ -676,12 +676,16 @@ main[data-template="product"] :is(button, .button) {
 
 /* Homepage hero (desktop only): the photo fills the whole first screen, the header floats on top of it */
 @media (min-width: 750px) {
-  #MainContent[data-template="index"] .hero-wrapper:first-child {
+  #MainContent[data-template="index"] .hero-wrapper {
     --hero-height-offset: 0px !important;
   }
-  #MainContent[data-template="index"] .hero-wrapper:first-child .hero {
+  #MainContent[data-template="index"] .hero {
     --hero-min-height: 100svh !important;
-    min-height: 100svh;
+    min-height: 100svh !important;
+  }
+  #MainContent[data-template="index"] .hero__container,
+  #MainContent[data-template="index"] .hero__media-wrapper {
+    min-height: 100svh !important;
   }
 }
 
