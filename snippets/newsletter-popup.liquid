@@ -288,10 +288,10 @@
       });
 
     const subscribeEmail = (email) =>
-      send(LIST_ID, { email, subscriptions: { email: { marketing: { consent: 'SUBSCRIBED' } } } });
+      send(LIST_ID, { email });
 
     const subscribeSms = (email, phone) =>
-      send(SMS_LIST_ID, { email, phone_number: phone, subscriptions: { sms: { marketing: { consent: 'SUBSCRIBED' } } } });
+      send(SMS_LIST_ID, { email, phone_number: phone });
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
