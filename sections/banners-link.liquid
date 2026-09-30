@@ -25,8 +25,8 @@
   .banner-container {
     min-height: 100vh;
     min-height: 100svh;
-    /* TEST photo (desktop only). To go back to the photo chosen in the theme editor, delete the next line. */
-    background-image: url('{{ 'banner-desktop-test.jpg' | asset_url }}') !important;
+    /* Desktop photo (mobile keeps the photo chosen in the theme editor) */
+    background-image: url('{{ 'banner-desktop.jpg' | asset_url }}') !important;
   }
 }
 
