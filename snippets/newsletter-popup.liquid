@@ -272,24 +272,26 @@
       thanks.hidden = false;
     };
 
-    const subscribe = (email, phone) => {
-      const attributes = { email, subscriptions: { email: { marketing: { consent: 'SUBSCRIBED' } } } };
-      if (phone) {
-        attributes.phone_number = phone;
-        attributes.subscriptions.sms = { marketing: { consent: 'SUBSCRIBED' } };
-      }
-      return fetch('https://a.klaviyo.com/client/subscriptions/?company_id=' + COMPANY_ID, {
+    const SMS_LIST_ID = 'XcfhsF';
+
+    const send = (listId, attributes) =>
+      fetch('https://a.klaviyo.com/client/subscriptions/?company_id=' + COMPANY_ID, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', revision: '2024-10-15' },
         body: JSON.stringify({
           data: {
             type: 'subscription',
             attributes: { custom_source: 'Newsletter Popup', profile: { data: { type: 'profile', attributes } } },
-            relationships: { list: { data: { type: 'list', id: LIST_ID } } },
+            relationships: { list: { data: { type: 'list', id: listId } } },
           },
         }),
       });
-    };
+
+    const subscribeEmail = (email) =>
+      send(LIST_ID, { email, subscriptions: { email: { marketing: { consent: 'SUBSCRIBED' } } } });
+
+    const subscribeSms = (email, phone) =>
+      send(SMS_LIST_ID, { email, phone_number: phone, subscriptions: { sms: { marketing: { consent: 'SUBSCRIBED' } } } });
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -305,9 +307,9 @@
       thanks.hidden = true;
       button.disabled = true;
       try {
-        let response = await subscribe(email, phone);
-        // If SMS is not available on the account, still save the email.
-        if (!response.ok && phone) response = await subscribe(email, '');
+        const response = await subscribeEmail(email);
+        // The phone number is a bonus: if SMS is not available yet, the email signup still counts.
+        if (phone) { try { await subscribeSms(email, phone); } catch (err) {} }
         if (response.ok) showSuccess();
         else showError('Something went wrong. Please try again.');
       } catch (err) {
