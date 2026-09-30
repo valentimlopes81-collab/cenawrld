@@ -9,7 +9,7 @@
       <h2 class="cena-popup__title" id="cena-popup-title">10% OFF YOUR FIRST ORDER</h2>
       <p class="cena-popup__text">The drops, before everyone else.</p>
 
-      {% form 'customer', id: 'cena-popup-form', class: 'cena-popup__form' %}
+      {% form 'customer', id: 'cena-popup-form', class: 'cena-popup__form', target: 'cena-popup-frame' %}
         <input type="hidden" name="contact[tags]" value="newsletter">
         <input type="email" name="contact[email]" placeholder="Enter your email" autocomplete="email" required>
         <div class="cena-popup__phone">
@@ -34,6 +34,7 @@
         <button type="submit">GET 10% OFF <span aria-hidden="true">&rarr;</span></button>
       {% endform %}
 
+      <iframe name="cena-popup-frame" title="" tabindex="-1" aria-hidden="true" style="display:none"></iframe>
       <p class="cena-popup__thanks" data-cena-popup-thanks hidden>We've just dropped your discount code in your inbox. Use it on your first order.</p>
     </div>
   </div>
@@ -250,28 +251,21 @@
     });
 
     const form = popup.querySelector('form');
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+    form.addEventListener('submit', () => {
       const phone = form.querySelector('[data-cena-popup-phone]').value.trim();
       const code = form.querySelector('[data-cena-popup-code]').value;
       form.querySelector('[data-cena-popup-note]').value = phone ? 'Phone: ' + code + ' ' + phone : '';
-      const button = form.querySelector('button[type="submit"]');
-      button.disabled = true;
-      const thanks = popup.querySelector('[data-cena-popup-thanks]');
-      try {
-        await fetch(form.action, { method: 'POST', body: new FormData(form), redirect: 'manual' });
+
+      // The form posts into the hidden iframe, so the visitor never leaves the page.
+      setTimeout(() => {
+        const thanks = popup.querySelector('[data-cena-popup-thanks]');
         popup.querySelector('.cena-popup__title').style.display = 'none';
         popup.querySelector('.cena-popup__text').style.display = 'none';
         form.style.display = 'none';
         thanks.textContent = "We've just dropped your discount code in your inbox. Use it on your first order.";
         thanks.classList.add('is-success');
         thanks.hidden = false;
-      } catch (err) {
-        button.disabled = false;
-        thanks.textContent = 'Something went wrong. Please try again.';
-        thanks.classList.remove('is-success');
-        thanks.hidden = false;
-      }
+      }, 50);
     });
 
     setTimeout(open, DELAY);
