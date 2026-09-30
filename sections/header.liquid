@@ -674,26 +674,6 @@ main[data-template="product"] :is(button, .button) {
   text-transform: none;
 }
 
-/* Homepage hero (desktop only): the photo fills the whole first screen, the header floats on top of it */
-@media (min-width: 750px) {
-  #MainContent[data-template="index"] > .shopify-section:first-child,
-  #MainContent[data-template="index"] > .shopify-section:first-child .hero-wrapper,
-  #MainContent[data-template="index"] .hero,
-  #MainContent[data-template="index"] .hero__container,
-  #MainContent[data-template="index"] .hero__media-wrapper,
-  #shopify-section-hero_rhMed7,
-  #shopify-section-hero_rhMed7 .hero,
-  #shopify-section-hero_rhMed7 .hero__container {
-    --hero-height-offset: 0px !important;
-    --hero-min-height: 100vh !important;
-    min-height: 100vh !important;
-  }
-  #MainContent[data-template="index"] .hero,
-  #MainContent[data-template="index"] .hero__container {
-    height: 100vh !important;
-  }
-}
-
 /* Homepage hero: custom desktop-only photo (mobile keeps the original) */
 @media (min-width: 750px) {
   #MainContent[data-template="index"] .hero__image--desktop {
