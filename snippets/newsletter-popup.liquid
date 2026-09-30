@@ -9,9 +9,8 @@
       <h2 class="cena-popup__title" id="cena-popup-title">10% OFF YOUR FIRST ORDER</h2>
       <p class="cena-popup__text">The drops, before everyone else.</p>
 
-      {% form 'customer', id: 'cena-popup-form', class: 'cena-popup__form', target: 'cena-popup-frame' %}
-        <input type="hidden" name="contact[tags]" value="newsletter">
-        <input type="email" name="contact[email]" placeholder="Enter your email" autocomplete="email" required>
+      <form class="cena-popup__form" id="cena-popup-form" novalidate>
+        <input type="email" name="email" data-cena-popup-email placeholder="Enter your email" autocomplete="email" required>
         <div class="cena-popup__phone">
           <select data-cena-popup-code aria-label="Country code">
             <option value="+351" selected>+351</option>
@@ -30,11 +29,10 @@
           <input type="tel" data-cena-popup-phone placeholder="912 345 678" autocomplete="tel-national" inputmode="tel">
           <span class="cena-popup__optional">OPTIONAL</span>
         </div>
-        <input type="hidden" name="contact[note]" value="" data-cena-popup-note>
         <button type="submit">GET 10% OFF <span aria-hidden="true">&rarr;</span></button>
-      {% endform %}
+        <p class="cena-popup__legal">By entering your phone number you agree to receive marketing text messages. Msg &amp; data rates may apply. You can unsubscribe at any time.</p>
+      </form>
 
-      <iframe class="cena-popup__frame" name="cena-popup-frame" title="Security check" hidden></iframe>
       <p class="cena-popup__thanks" data-cena-popup-thanks hidden>We've just dropped your discount code in your inbox. Use it on your first order.</p>
     </div>
   </div>
@@ -187,16 +185,7 @@
     border-radius: 8px;
   }
 
-  .cena-popup__frame {
-    display: block;
-    width: 100%;
-    height: 420px;
-    margin-top: 12px;
-    border: 0;
-    border-radius: 16px;
-    background: #fff;
-  }
-  .cena-popup__frame[hidden] { display: none; }
+  .cena-popup__legal { margin: 0; font-size: 11px; line-height: 1.4; color: rgba(255, 255, 255, 0.6); }
 
   .cena-popup__thanks { margin: 16px 0 0; font-size: 14px; font-weight: 600; }
   .cena-popup__thanks.is-success {
@@ -262,13 +251,12 @@
     });
 
     const form = popup.querySelector('form');
-    const frame = popup.querySelector('.cena-popup__frame');
+    const COMPANY_ID = 'TiTvcE';
+    const LIST_ID = 'SYntP6';
     const thanks = popup.querySelector('[data-cena-popup-thanks]');
     const button = form.querySelector('button[type="submit"]');
-    let submitted = false;
 
     const showSuccess = () => {
-      frame.hidden = true;
       popup.querySelector('.cena-popup__title').style.display = 'none';
       popup.querySelector('.cena-popup__text').style.display = 'none';
       form.style.display = 'none';
@@ -278,52 +266,53 @@
     };
 
     const showError = (message) => {
-      frame.hidden = true;
-      form.style.display = '';
       button.disabled = false;
-      submitted = false;
       thanks.classList.remove('is-success');
       thanks.textContent = message;
       thanks.hidden = false;
     };
 
-    form.addEventListener('submit', () => {
-      const phone = form.querySelector('[data-cena-popup-phone]').value.trim();
-      const code = form.querySelector('[data-cena-popup-code]').value;
-      form.querySelector('[data-cena-popup-note]').value = phone ? 'Phone: ' + code + ' ' + phone : '';
-      submitted = true;
-      button.disabled = true;
+    const subscribe = (email, phone) => {
+      const attributes = { email, subscriptions: { email: { marketing: { consent: 'SUBSCRIBED' } } } };
+      if (phone) {
+        attributes.phone_number = phone;
+        attributes.subscriptions.sms = { marketing: { consent: 'SUBSCRIBED' } };
+      }
+      return fetch('https://a.klaviyo.com/client/subscriptions/?company_id=' + COMPANY_ID, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', revision: '2024-10-15' },
+        body: JSON.stringify({
+          data: {
+            type: 'subscription',
+            attributes: { custom_source: 'Newsletter Popup', profile: { data: { type: 'profile', attributes } } },
+            relationships: { list: { data: { type: 'list', id: LIST_ID } } },
+          },
+        }),
+      });
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = form.querySelector('[data-cena-popup-email]').value.trim();
+      const digits = form.querySelector('[data-cena-popup-phone]').value.replace(/\D/g, '');
+      const phone = digits.length >= 6 ? form.querySelector('[data-cena-popup-code]').value + digits : '';
+
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+        showError('Please enter a valid email.');
+        return;
+      }
+
       thanks.hidden = true;
-    });
-
-    // The form posts into this frame, so the visitor never leaves the page.
-    // We only show the success message once Shopify has really accepted the signup.
-    frame.addEventListener('load', () => {
-      if (!submitted) return;
-      let path = '';
-      let hasErrors = false;
+      button.disabled = true;
       try {
-        path = frame.contentWindow.location.pathname;
-        hasErrors = !!frame.contentDocument.querySelector('.errors, ul.errors, .form-status-list');
+        let response = await subscribe(email, phone);
+        // If SMS is not available on the account, still save the email.
+        if (!response.ok && phone) response = await subscribe(email, '');
+        if (response.ok) showSuccess();
+        else showError('Something went wrong. Please try again.');
       } catch (err) {
-        frame.hidden = false;
-        return;
+        showError('Something went wrong. Please try again.');
       }
-
-      if (path.indexOf('challenge') !== -1) {
-        // Shopify asks for a quick "I am human" check: show it inside the pop-up.
-        form.style.display = 'none';
-        popup.querySelector('.cena-popup__text').textContent = 'One quick check, then your code is on its way.';
-        frame.hidden = false;
-        return;
-      }
-
-      if (hasErrors) {
-        showError('Something went wrong. Please check your email and try again.');
-        return;
-      }
-
-      showSuccess();
     });
 
     setTimeout(open, DELAY);
