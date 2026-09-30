@@ -674,6 +674,17 @@ main[data-template="product"] :is(button, .button) {
   text-transform: none;
 }
 
+/* Homepage hero (desktop only): the photo fills the whole first screen, the header floats on top of it */
+@media (min-width: 750px) {
+  #MainContent[data-template="index"] .hero-wrapper:first-child {
+    --hero-height-offset: 0px !important;
+  }
+  #MainContent[data-template="index"] .hero-wrapper:first-child .hero {
+    --hero-min-height: 100svh !important;
+    min-height: 100svh;
+  }
+}
+
 /* Homepage hero: custom desktop-only photo (mobile keeps the original) */
 @media (min-width: 750px) {
   #MainContent[data-template="index"] .hero__image--desktop {
