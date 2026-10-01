@@ -1,6 +1,6 @@
 {%- comment -%}
   Password page ("store closed"): the page is dark and is only discovered through a flashlight.
-  - Desktop: the torch follows the cursor. Touch / before the first mouse move: it sits above the email box.
+  - Desktop: the torch follows the cursor. Touch: it follows the finger while dragging and stays for 4 s; at rest it sits above the email box.
   - The torch lens carries a "sticker" (CENA logo / KEEP CENA A SECRET) and, now and then, the batteries fail:
     the light stutters, sags or blacks out, and the sticker swaps.
   - Everything stays in the HTML (only hidden by darkness), so the form keeps working without JS and for screen readers.
@@ -32,6 +32,14 @@
   .cena-torch-on body {
     background: #000;
     cursor: none;
+    touch-action: pinch-zoom; /* a finger drags the torch instead of scrolling the page */
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+  .cena-torch-on input {
+    -webkit-user-select: text;
+    user-select: text;
   }
   .cena-torch-on input,
   .cena-torch-on button,
@@ -93,17 +101,42 @@
     window.addEventListener('resize', resize);
 
     // ---- pointer ----------------------------------------------------------------
+    // mouse: the torch follows the cursor. touch: it follows the finger while dragging and stays where you left it for a few seconds.
     const mouse = { x: 0, y: 0, seen: false };
+    const touch = { x: 0, y: 0, down: false, seen: false, end: 0 };
+    const HOLD_AFTER_TOUCH = 4000;
     window.addEventListener(
-      'pointermove',
+      'pointerdown',
       (e) => {
-        if (e.pointerType === 'touch') return;
-        mouse.x = e.clientX;
-        mouse.y = e.clientY;
-        mouse.seen = true;
+        if (e.pointerType === 'mouse') return;
+        touch.x = e.clientX;
+        touch.y = e.clientY;
+        touch.down = true;
+        touch.seen = true;
       },
       { passive: true }
     );
+    window.addEventListener(
+      'pointermove',
+      (e) => {
+        if (e.pointerType === 'mouse') {
+          mouse.x = e.clientX;
+          mouse.y = e.clientY;
+          mouse.seen = true;
+        } else if (touch.down) {
+          touch.x = e.clientX;
+          touch.y = e.clientY;
+        }
+      },
+      { passive: true }
+    );
+    const release = (e) => {
+      if (e.pointerType === 'mouse' || !touch.down) return;
+      touch.down = false;
+      touch.end = performance.now();
+    };
+    window.addEventListener('pointerup', release, { passive: true });
+    window.addEventListener('pointercancel', release, { passive: true });
 
     // ---- where the content lives (the torch sits just above it on touch screens) ----
     const contentBox = () => {
@@ -220,29 +253,32 @@
 
       // position
       const box = contentBox();
-      const anchored = coarse || !mouse.seen;
+      const touching = touch.seen && (touch.down || now - touch.end < HOLD_AFTER_TOUCH);
+      const free = touching || (mouse.seen && !coarse);
       let tx;
       let ty;
-      let bx;
-      let by;
-      if (anchored) {
-        tx = box.cx + Math.sin(now / 1700) * 9;
-        ty = Math.max(rd * 0.95 + 8, box.top - rd * 1.12 - 16) + Math.cos(now / 2300) * 5;
-        bx = tx + (box.cx - tx) * 0.2;
-        by = ty + (box.cy - ty) * 0.7; // the beam is centred on the email area
-      } else {
+      let rate;
+      if (touching) {
+        // the lens sits just above the fingertip so the finger never hides it
+        tx = touch.x;
+        ty = Math.max(rd * 0.9 + 6, touch.y - rd * 1.1 - 14);
+        rate = 48;
+      } else if (free) {
         tx = mouse.x;
         ty = mouse.y;
-        bx = lens.x;
-        by = lens.y;
+        rate = 65;
+      } else {
+        // resting position: just above the content, with a slow hand-held drift
+        tx = box.cx + Math.sin(now / 1700) * 9;
+        ty = Math.max(rd * 0.95 + 8, box.top - rd * 1.12 - 16) + Math.cos(now / 2300) * 5;
+        rate = 120;
       }
-      const follow = 1 - Math.exp(-dt / (anchored ? 120 : 65));
+      const follow = 1 - Math.exp(-dt / rate);
       lens.x += (tx - lens.x) * follow;
       lens.y += (ty - lens.y) * follow;
-      if (!anchored) {
-        bx = lens.x;
-        by = lens.y;
-      }
+      // free: the beam is centred on the lens. resting: it is centred on the email area
+      const bx = free ? lens.x : lens.x + (box.cx - lens.x) * 0.2;
+      const by = free ? lens.y : lens.y + (box.cy - lens.y) * 0.7;
       let lx = lens.x;
       let ly = lens.y;
       if (now < shakeUntil) {
