@@ -1,6 +1,6 @@
 {%- comment -%}
   Password page ("store closed"): the page is dark and is only discovered through a flashlight.
-  - Desktop: the torch follows the cursor. Touch: it follows the finger while dragging and stays for 4 s; at rest it sits above the email box.
+  - Desktop: the torch follows the cursor. Touch: it follows the finger while dragging and stays for 4 s; at rest it sits in the middle of the screen, level with the email block.
   - The torch lens carries a "sticker" (CENA logo / KEEP CENA A SECRET) and, now and then, the batteries fail:
     the light stutters, sags or blacks out, and the sticker swaps.
   - Everything stays in the HTML (only hidden by darkness), so the form keeps working without JS and for screen readers.
@@ -53,6 +53,25 @@
     .cena-torch-on body {
       cursor: auto;
     }
+  }
+  /* the email block sits in the exact middle of the screen; the footer link is pinned to the bottom */
+  .cena-torch-on,
+  .cena-torch-on body {
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+  }
+  .cena-torch-on .password-main-content .section-content-wrapper {
+    --section-min-height: 100vh;
+    --section-min-height: 100dvh;
+    --section-height-offset: 0px;
+  }
+  .cena-torch-on footer {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 5;
   }
 </style>
 
@@ -254,8 +273,7 @@
       // position
       const box = contentBox();
       const touching = touch.seen && (touch.down || now - touch.end < HOLD_AFTER_TOUCH);
-      const free = touching || (mouse.seen && !coarse);
-      let tx;
+            let tx;
       let ty;
       let rate;
       if (touching) {
@@ -263,22 +281,21 @@
         tx = touch.x;
         ty = Math.max(rd * 0.9 + 6, touch.y - rd * 1.1 - 14);
         rate = 48;
-      } else if (free) {
+      } else if (mouse.seen && !coarse) {
         tx = mouse.x;
         ty = mouse.y;
         rate = 65;
       } else {
-        // resting position: just above the content, with a slow hand-held drift
-        tx = box.cx + Math.sin(now / 1700) * 9;
-        ty = Math.max(rd * 0.95 + 8, box.top - rd * 1.12 - 16) + Math.cos(now / 2300) * 5;
+        // resting position: the middle of the screen, level with the email block (slow hand-held drift)
+        tx = W / 2 + Math.sin(now / 1700) * 7;
+        ty = clamp(box.cy, rd, H - rd) + Math.cos(now / 2300) * 4;
         rate = 120;
       }
       const follow = 1 - Math.exp(-dt / rate);
       lens.x += (tx - lens.x) * follow;
       lens.y += (ty - lens.y) * follow;
-      // free: the beam is centred on the lens. resting: it is centred on the email area
-      const bx = free ? lens.x : lens.x + (box.cx - lens.x) * 0.2;
-      const by = free ? lens.y : lens.y + (box.cy - lens.y) * 0.7;
+      const bx = lens.x;
+      const by = lens.y;
       let lx = lens.x;
       let ly = lens.y;
       if (now < shakeUntil) {
