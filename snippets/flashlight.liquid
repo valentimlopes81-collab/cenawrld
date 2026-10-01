@@ -1,0 +1,357 @@
+{%- comment -%}
+  Password page ("store closed"): the page is dark and is only discovered through a flashlight.
+  - Desktop: the torch follows the cursor. Touch / before the first mouse move: it sits above the email box.
+  - The torch lens carries a "sticker" (CENA logo / KEEP CENA A SECRET) and, now and then, the batteries fail:
+    the light stutters, sags or blacks out, and the sticker swaps.
+  - Everything stays in the HTML (only hidden by darkness), so the form keeps working without JS and for screen readers.
+  - Flicker is limited to 3 dips per second and is switched off for visitors who ask for reduced motion.
+{%- endcomment -%}
+
+<canvas
+  id="cena-torch"
+  aria-hidden="true"
+  data-cena="{{ 'flashlight-cena.png' | asset_url }}"
+  data-secret="{{ 'flashlight-secret.png' | asset_url }}"
+></canvas>
+
+<style>
+  #cena-torch {
+    display: none;
+  }
+  .cena-torch-on #cena-torch {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    z-index: 60;
+    pointer-events: none;
+  }
+  .cena-torch-on body {
+    background: #000;
+    cursor: none;
+  }
+  .cena-torch-on input,
+  .cena-torch-on button,
+  .cena-torch-on a {
+    cursor: pointer;
+  }
+  .cena-torch-on input {
+    cursor: text;
+  }
+  @media (hover: none), (pointer: coarse) {
+    .cena-torch-on body {
+      cursor: auto;
+    }
+  }
+</style>
+
+<script>
+  (() => {
+    const canvas = document.getElementById('cena-torch');
+    const ctx = canvas && canvas.getContext('2d');
+    if (!canvas || !ctx) return;
+
+    const root = document.documentElement;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const coarse = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+    root.classList.add('cena-torch-on');
+
+    const DARKNESS = 0.965; // how much of the page is hidden away from the light (almost everything)
+    const rand = (a, b) => a + Math.random() * (b - a);
+    const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+
+    // ---- stickers -------------------------------------------------------------
+    const load = (src) => {
+      const img = new Image();
+      img.decoding = 'async';
+      img.src = src;
+      return img;
+    };
+    const stickers = [
+      { img: load(canvas.dataset.cena), box: [1.34, 0.72] },
+      { img: load(canvas.dataset.secret), box: [1.04, 1.04] },
+    ];
+    let current = 0;
+    let previous = 0;
+    let mix = 1; // 1 = only "current" visible (used for the reduced-motion cross-fade)
+
+    // ---- size -------------------------------------------------------------------
+    let W = 0;
+    let H = 0;
+    let dpr = 1;
+    const resize = () => {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = window.innerWidth;
+      H = window.innerHeight;
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    // ---- pointer ----------------------------------------------------------------
+    const mouse = { x: 0, y: 0, seen: false, overUi: false };
+    window.addEventListener(
+      'pointermove',
+      (e) => {
+        if (e.pointerType === 'touch') return;
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+        mouse.seen = true;
+        mouse.overUi = !!(e.target && e.target.closest && e.target.closest('input, button, a, label, select, textarea'));
+      },
+      { passive: true }
+    );
+    document.documentElement.addEventListener('pointerleave', () => {
+      mouse.overUi = false;
+    });
+
+    // ---- where the content lives (the torch sits just above it on touch screens) ----
+    const contentBox = () => {
+      const wrap = document.querySelector('.section-content-wrapper');
+      let top = Infinity;
+      let bottom = -Infinity;
+      let left = Infinity;
+      let right = -Infinity;
+      if (wrap) {
+        for (const el of wrap.children) {
+          const r = el.getBoundingClientRect();
+          if (!r.width || !r.height) continue;
+          top = Math.min(top, r.top);
+          bottom = Math.max(bottom, r.bottom);
+          left = Math.min(left, r.left);
+          right = Math.max(right, r.right);
+        }
+      }
+      if (!isFinite(top)) return { top: H * 0.46, bottom: H * 0.54, cx: W / 2, cy: H / 2 };
+      return { top, bottom, cx: (left + right) / 2, cy: (top + bottom) / 2 };
+    };
+
+    // ---- the batteries --------------------------------------------------------------
+    // A "fault" is a list of [milliseconds, brightness] keyframes. Dips are spaced >= 330 ms apart (max ~3 per second).
+    const makeFault = () => {
+      const r = Math.random();
+      let keys;
+      let swapAt;
+      if (r < 0.5) {
+        // stutter: 2-4 quick dips
+        const dips = 2 + Math.floor(Math.random() * 3);
+        keys = [[0, 1]];
+        let t = 0;
+        for (let i = 0; i < dips; i++) {
+          const level = rand(0, 0.32);
+          const hold = rand(60, 120);
+          keys.push([t + 30, level], [t + 30 + hold, level], [t + 30 + hold + 50, i === dips - 1 ? 1 : rand(0.8, 1)]);
+          if (i === 0) swapAt = t + 30 + hold * 0.5;
+          t += 340 + rand(0, 140);
+        }
+      } else if (r < 0.8) {
+        // sag: the light weakens, wobbles and recovers
+        keys = [[0, 1], [220, 0.34], [330, 0.4], [470, 0.28], [620, 0.5], [900, 1]];
+        swapAt = 330;
+      } else {
+        // blackout: dead for a moment, comes back with a hiccup
+        const off = rand(380, 720);
+        keys = [[0, 1], [40, 0], [off, 0], [off + 70, 0.92], [off + 300, 0.45], [off + 380, 1]];
+        swapAt = off * 0.5;
+      }
+      return { keys, swapAt, start: 0, swapped: false };
+    };
+
+    const level = (keys, t) => {
+      if (t <= keys[0][0]) return keys[0][1];
+      for (let i = 1; i < keys.length; i++) {
+        if (t <= keys[i][0]) {
+          const [t0, v0] = keys[i - 1];
+          const [t1, v1] = keys[i];
+          return v0 + ((v1 - v0) * (t - t0)) / (t1 - t0 || 1);
+        }
+      }
+      return 1;
+    };
+
+    let fault = null;
+    let nextFault = performance.now() + 1400;
+    let nextSwap = performance.now() + 7000; // reduced motion: slow cross-fade instead of faults
+
+    // ---- state ----------------------------------------------------------------
+    const lens = { x: W / 2, y: H / 2, scale: 1 };
+    let last = performance.now();
+    let shakeUntil = 0;
+
+    const draw = (now) => {
+      requestAnimationFrame(draw);
+      if (document.hidden) return;
+      const dt = Math.min(64, now - last);
+      last = now;
+
+      const small = coarse || W < 750;
+      const rd = small ? clamp(W * 0.17, 48, 66) : 92; // lens radius
+      const R = small ? Math.min(W * 1.05, 340) : Math.min(Math.max(W, H) * 0.5, 440); // reach of the light
+
+      // intensity: tiny natural wobble + battery faults
+      let I = 1 - 0.022 * ((Math.sin(now * 0.013) + Math.sin(now * 0.031 + 2) + Math.sin(now * 0.0071 + 4)) / 3 + 1);
+      if (!reduced) {
+        if (!fault && now >= nextFault) {
+          fault = makeFault();
+          fault.start = now;
+          shakeUntil = now + 220;
+        }
+        if (fault) {
+          const t = now - fault.start;
+          I *= level(fault.keys, t);
+          if (!fault.swapped && t >= fault.swapAt) {
+            fault.swapped = true;
+            previous = current;
+            current = 1 - current;
+          }
+          if (t > fault.keys[fault.keys.length - 1][0]) {
+            fault = null;
+            nextFault = now + rand(1500, 3800);
+          }
+        }
+      } else if (now >= nextSwap) {
+        previous = current;
+        current = 1 - current;
+        mix = 0;
+        nextSwap = now + 7000;
+      }
+      if (mix < 1) mix = Math.min(1, mix + dt / 1200);
+
+      // position
+      const box = contentBox();
+      const anchored = coarse || !mouse.seen;
+      let tx;
+      let ty;
+      let bx;
+      let by;
+      if (anchored) {
+        tx = box.cx + Math.sin(now / 1700) * 9;
+        ty = Math.max(rd * 0.95 + 8, box.top - rd * 1.12 - 16) + Math.cos(now / 2300) * 5;
+        bx = tx + (box.cx - tx) * 0.2;
+        by = ty + (box.cy - ty) * 0.7; // the beam is centred on the email area
+      } else {
+        tx = mouse.x;
+        ty = mouse.y;
+        bx = lens.x;
+        by = lens.y;
+      }
+      const follow = 1 - Math.exp(-dt / (anchored ? 120 : 65));
+      lens.x += (tx - lens.x) * follow;
+      lens.y += (ty - lens.y) * follow;
+      if (!anchored) {
+        bx = lens.x;
+        by = lens.y;
+      }
+      let lx = lens.x;
+      let ly = lens.y;
+      if (now < shakeUntil) {
+        lx += rand(-1.6, 1.6);
+        ly += rand(-1.6, 1.6);
+      }
+
+      // when the cursor is over the form (or the form has focus) the lens shrinks, so you can read and type
+      const active = document.activeElement;
+      const focusUi = active && active.matches && active.matches('input, button, select, textarea') ? active : null;
+      const wantScale = (!anchored && mouse.overUi) || (anchored && focusUi) ? 0.26 : 1;
+      lens.scale += (wantScale - lens.scale) * (1 - Math.exp(-dt / 90));
+      const lr = rd * lens.scale;
+
+      // ---- paint ----
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.globalAlpha = 1;
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = 'rgba(0,0,0,' + DARKNESS + ')';
+      ctx.fillRect(0, 0, W, H);
+
+      // 1. the light cuts a hole in the darkness (soft, inverse-square-like falloff)
+      ctx.globalCompositeOperation = 'destination-out';
+      const hole = (cx, cy, radius, k) => {
+        const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+        g.addColorStop(0, 'rgba(0,0,0,' + clamp(1 * k, 0, 1) + ')');
+        g.addColorStop(0.15, 'rgba(0,0,0,' + clamp(0.93 * k, 0, 1) + ')');
+        g.addColorStop(0.35, 'rgba(0,0,0,' + clamp(0.62 * k, 0, 1) + ')');
+        g.addColorStop(0.6, 'rgba(0,0,0,' + clamp(0.28 * k, 0, 1) + ')');
+        g.addColorStop(0.85, 'rgba(0,0,0,' + clamp(0.07 * k, 0, 1) + ')');
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = g;
+        ctx.fillRect(cx - radius, cy - radius, radius * 2, radius * 2);
+      };
+      hole(bx, by, R, I);
+      if (focusUi) {
+        // keyboard users: the focused field is always readable
+        const r = focusUi.getBoundingClientRect();
+        hole(r.left + r.width / 2, r.top + r.height / 2, Math.max(r.width, r.height) * 0.75 + 70, 0.95);
+      }
+
+      // 2. a faint haze so the beam itself is visible on the black page
+      ctx.globalCompositeOperation = 'lighter';
+      const haze = ctx.createRadialGradient(bx, by, 0, bx, by, R);
+      haze.addColorStop(0, 'rgba(255,246,226,' + 0.11 * I + ')');
+      haze.addColorStop(0.5, 'rgba(255,246,226,' + 0.04 * I + ')');
+      haze.addColorStop(1, 'rgba(255,246,226,0)');
+      ctx.fillStyle = haze;
+      ctx.fillRect(bx - R, by - R, R * 2, R * 2);
+
+      // 3. the lens: bloom + glowing disc
+      const bloomR = lr * 3;
+      const bloom = ctx.createRadialGradient(lx, ly, lr * 0.4, lx, ly, bloomR);
+      bloom.addColorStop(0, 'rgba(255,250,240,' + 0.55 * I + ')');
+      bloom.addColorStop(1, 'rgba(255,250,240,0)');
+      ctx.fillStyle = bloom;
+      ctx.fillRect(lx - bloomR, ly - bloomR, bloomR * 2, bloomR * 2);
+
+      ctx.globalCompositeOperation = 'source-over';
+      const disc = ctx.createRadialGradient(lx, ly, 0, lx, ly, lr);
+      disc.addColorStop(0, 'rgba(255,255,255,1)');
+      disc.addColorStop(0.55, 'rgba(252,252,247,0.98)');
+      disc.addColorStop(0.8, 'rgba(238,238,232,0.88)');
+      disc.addColorStop(0.93, 'rgba(205,205,200,0.4)');
+      disc.addColorStop(1, 'rgba(170,170,165,0)');
+      ctx.globalAlpha = clamp(I * 1.04, 0, 1);
+      ctx.fillStyle = disc;
+      ctx.beginPath();
+      ctx.arc(lx, ly, lr, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 4. the sticker over the lens (multiplied, so the light shines through the paper)
+      if (lens.scale > 0.5) {
+        const fade = clamp((lens.scale - 0.5) / 0.5, 0, 1);
+        const paint = (idx, alpha) => {
+          const s = stickers[idx];
+          const img = s.img;
+          if (!img.complete || !img.naturalWidth || alpha <= 0.01) return;
+          const maxW = s.box[0] * lr;
+          const maxH = s.box[1] * lr;
+          const k = Math.min(maxW / img.naturalWidth, maxH / img.naturalHeight);
+          const w = img.naturalWidth * k;
+          const h = img.naturalHeight * k;
+          ctx.globalCompositeOperation = 'multiply';
+          ctx.globalAlpha = clamp(0.88 * alpha * fade * (0.55 + 0.45 * I), 0, 1);
+          ctx.drawImage(img, lx - w / 2, ly - h / 2, w, h);
+        };
+        if (mix < 1) paint(previous, 1 - mix);
+        paint(current, mix < 1 ? mix : 1);
+
+        // light bleeding through the sticker
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.globalAlpha = 1;
+        const wash = ctx.createRadialGradient(lx, ly, 0, lx, ly, lr * 0.95);
+        wash.addColorStop(0, 'rgba(255,255,255,' + 0.2 * I * fade + ')');
+        wash.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = wash;
+        ctx.beginPath();
+        ctx.arc(lx, ly, lr, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = 'source-over';
+    };
+
+    requestAnimationFrame(draw);
+  })();
+</script>
