@@ -11,6 +11,17 @@
   "type": "header",
   "name": "Header",
   "sections": {
+    "announcement_bar_VnPdxQ": {
+      "type": "announcement-bar",
+      "name": "Animated announcement bar",
+      "settings": {
+        "message": "FEEDING THE STREETS — CENA® ALL RIGHTS RESERVED",
+        "bg_color": "#030302",
+        "text_color": "#ffffff",
+        "speed": 70,
+        "phrase_spacing": 24
+      }
+    },
     "header_section": {
       "type": "header",
       "custom_css": [],
@@ -20,6 +31,7 @@
     }
   },
   "order": [
+    "announcement_bar_VnPdxQ",
     "header_section"
   ]
 }
