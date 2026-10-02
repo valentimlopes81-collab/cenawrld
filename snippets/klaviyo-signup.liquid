@@ -1,0 +1,64 @@
+{%- comment -%}
+  Newsletter forms (footer + the email box on the "store closed" page) subscribe straight to the Klaviyo Email List,
+  exactly like the pop-up, so the welcome flow ("added to Email List") fires for every signup source.
+  If anything fails (blocked request, JS error) the form falls back to Shopify's normal submit.
+{%- endcomment -%}
+<script>
+  (() => {
+    const COMPANY_ID = 'TiTvcE';
+    const LIST_ID = 'SYntP6';
+    const MESSAGE = "You're in. Check your inbox for your 10% code.";
+
+    const isNewsletterForm = (form) =>
+      form &&
+      form.matches &&
+      form.querySelector('input[name="contact[email]"]') &&
+      form.querySelector('input[name="form_type"][value="customer"]');
+
+    const subscribe = (email) =>
+      fetch('https://a.klaviyo.com/client/subscriptions/?company_id=' + COMPANY_ID, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', revision: '2024-10-15' },
+        body: JSON.stringify({
+          data: {
+            type: 'subscription',
+            attributes: {
+              custom_source: 'Newsletter Form',
+              profile: { data: { type: 'profile', attributes: { email } } },
+            },
+            relationships: { list: { data: { type: 'list', id: LIST_ID } } },
+          },
+        }),
+      });
+
+    document.addEventListener(
+      'submit',
+      (e) => {
+        const form = e.target;
+        if (!isNewsletterForm(form) || form.dataset.klaviyoDone) return;
+        const input = form.querySelector('input[name="contact[email]"]');
+        const email = (input.value || '').trim();
+        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return; // let the browser show its own validation
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        form.dataset.klaviyoDone = '1';
+
+        subscribe(email)
+          .then((r) => {
+            if (!r.ok) throw new Error('klaviyo ' + r.status);
+            const note = document.createElement('p');
+            note.setAttribute('role', 'status');
+            note.className = 'klaviyo-signup-message';
+            note.style.cssText = 'margin:0;font-weight:600;';
+            note.textContent = MESSAGE;
+            form.replaceWith(note);
+          })
+          .catch((err) => {
+            console.error('[newsletter] Klaviyo signup failed, using the normal form', err);
+            form.submit(); // fallback: Shopify's own submit
+          });
+      },
+      true
+    );
+  })();
+</script>
