@@ -873,6 +873,25 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 });
 </script>
+<script>
+  // Keep the header cart badge in sync right away (no page reload needed)
+  (() => {
+    const badges = () => document.querySelectorAll('.cart-count');
+    const render = (n) => badges().forEach((el) => { el.textContent = n; });
+    const refresh = () =>
+      fetch('/cart.js', { headers: { Accept: 'application/json' }, cache: 'no-store' })
+        .then((r) => r.json())
+        .then((c) => render(c.item_count))
+        .catch(() => {});
+    document.addEventListener('cart:update', (e) => {
+      const total = e.detail && e.detail.resource && e.detail.resource.item_count;
+      if (typeof total === 'number') render(total);
+      refresh(); // confirm with the real cart
+    });
+    window.addEventListener('pageshow', (e) => { if (e.persisted) refresh(); });
+  })();
+</script>
+
 
 {% schema %}
 {
