@@ -11,13 +11,6 @@ if (!customElements.get('size-guide')) {
       this.details = this.row && this.row.querySelector('[data-size-guide-details]');
       this.rules = this.readRules();
 
-      const designMode = this.dataset.designMode === 'true';
-      if (!this.rules.length && !designMode) {
-        // no rules set for this product: don't show the row to visitors
-        if (this.row) this.row.remove();
-        return;
-      }
-
       this.hIn = this.querySelector('[data-height-input]');
       this.wIn = this.querySelector('[data-weight-input]');
       this.update = this.update.bind(this);
