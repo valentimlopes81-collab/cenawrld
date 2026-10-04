@@ -1,0 +1,179 @@
+{%- comment -%}
+  A row that looks like the accordion rows (PRODUCT DETAILS, SIZE & FIT…) but opens a pop-up where the customer
+  enters height and weight and gets the two recommended sizes. Rules come from the child "Size rule" blocks, so
+  the owner sets them per product page in the theme editor.
+{%- endcomment -%}
+{% assign s = block.settings %}
+
+<accordion-custom>
+  <details class="details size-guide__details" data-size-guide-details {{ block.shopify_attributes }}>
+    <summary class="details__header" role="button" aria-haspopup="dialog">
+      {{ s.heading }}
+      <span class="svg-wrapper icon-caret icon-animated">
+        {{- 'icon-caret.svg' | inline_asset_content -}}
+      </span>
+      <span class="svg-wrapper icon-plus">
+        {{- 'icon-plus.svg' | inline_asset_content -}}
+      </span>
+    </summary>
+    <div class="details-content"></div>
+  </details>
+</accordion-custom>
+
+<size-guide
+  class="size-guide"
+  data-design-mode="{{ request.design_mode }}"
+  data-height-min="{{ s.height_min }}"
+  data-height-max="{{ s.height_max }}"
+  data-weight-min="{{ s.weight_min }}"
+  data-weight-max="{{ s.weight_max }}"
+  data-default-height="{{ s.default_height }}"
+  data-default-weight="{{ s.default_weight }}"
+  data-tolerance="{{ s.tolerance }}"
+  data-or="{{ s.or_word | escape }}"
+  data-fallback="{{ s.fallback_text | escape }}"
+>
+  <div hidden>{% content_for 'blocks' %}</div>
+
+  <dialog class="size-guide__dialog" aria-labelledby="size-guide-title-{{ block.id }}">
+    <button type="button" class="size-guide__close" aria-label="Close" data-size-guide-close>
+      <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+
+    <p class="size-guide__eyebrow">{{ s.eyebrow }}</p>
+    <h2 class="size-guide__title" id="size-guide-title-{{ block.id }}">{{ s.title }}</h2>
+    <p class="size-guide__intro">{{ s.intro }}</p>
+
+    <div class="size-guide__stats">
+      <div class="size-guide__stat">
+        <span class="size-guide__stat-label">{{ s.height_label }}</span>
+        <span class="size-guide__stat-value" data-height-value>{{ s.default_height }}</span>
+        <span class="size-guide__stat-unit">CM</span>
+      </div>
+      <div class="size-guide__stat">
+        <span class="size-guide__stat-label">{{ s.weight_label }}</span>
+        <span class="size-guide__stat-value" data-weight-value>{{ s.default_weight }}</span>
+        <span class="size-guide__stat-unit">KG</span>
+      </div>
+    </div>
+
+    <div class="size-guide__slider">
+      <label class="size-guide__slider-label" for="sg-h-{{ block.id }}">{{ s.adjust_height_label }}</label>
+      <div class="size-guide__slider-row">
+        <input type="range" id="sg-h-{{ block.id }}" data-height-input min="{{ s.height_min }}" max="{{ s.height_max }}" step="1" value="{{ s.default_height }}">
+        <output class="size-guide__output" data-height-output>{{ s.default_height }} cm</output>
+      </div>
+    </div>
+
+    <div class="size-guide__slider">
+      <label class="size-guide__slider-label" for="sg-w-{{ block.id }}">{{ s.adjust_weight_label }}</label>
+      <div class="size-guide__slider-row">
+        <input type="range" id="sg-w-{{ block.id }}" data-weight-input min="{{ s.weight_min }}" max="{{ s.weight_max }}" step="1" value="{{ s.default_weight }}">
+        <output class="size-guide__output" data-weight-output>{{ s.default_weight }} kg</output>
+      </div>
+    </div>
+
+    <div class="size-guide__result" aria-live="polite">
+      <p class="size-guide__result-label">{{ s.result_label }}</p>
+      <p class="size-guide__result-size" data-result-size></p>
+      <p class="size-guide__result-text" data-result-text></p>
+    </div>
+  </dialog>
+</size-guide>
+
+<script src="{{ 'size-guide.js' | asset_url }}" defer></script>
+
+{% stylesheet %}
+  .size-guide { display: block; }
+  .size-guide__dialog {
+    width: min(720px, 94vw); max-height: 92vh; overflow: auto; margin: auto; padding: 30px; border: 0;
+    border-radius: 28px; background: #fff; color: #111; box-shadow: 0 30px 80px rgb(0 0 0 / 35%);
+  }
+  .size-guide__dialog::backdrop { background: rgb(0 0 0 / 45%); backdrop-filter: blur(4px); }
+  .size-guide__close {
+    position: absolute; top: 18px; right: 18px; width: 44px; height: 44px; display: flex;
+    align-items: center; justify-content: center; border: 1px solid #e3e3e3; border-radius: 50%;
+    background: #fff; color: #111; cursor: pointer;
+  }
+  .size-guide__eyebrow { margin: 0 56px 6px 0; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: #777; }
+  .size-guide__title { margin: 0 0 12px; font-size: 26px; line-height: 1.1; font-weight: 700; letter-spacing: -.01em; }
+  .size-guide__intro { margin: 0 0 22px; max-width: 30em; font-size: 15px; line-height: 1.6; color: #444; }
+  .size-guide__stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 22px; }
+  .size-guide__stat { display: flex; flex-direction: column; padding: 16px 18px; border: 1px solid #e3e3e3; border-radius: 22px; }
+  .size-guide__stat-label, .size-guide__stat-unit { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #777; }
+  .size-guide__stat-value { margin: 10px 0 8px; font-size: 44px; line-height: 1; font-weight: 700; }
+  .size-guide__slider { margin-bottom: 16px; }
+  .size-guide__slider-label { display: block; margin-bottom: 10px; font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  .size-guide__slider-row { display: flex; align-items: center; gap: 18px; }
+  .size-guide__slider-row input[type='range'] {
+    flex: 1; height: 8px; margin: 0; border-radius: 99px; appearance: none; -webkit-appearance: none; cursor: pointer;
+    background: linear-gradient(to right, #111 var(--pct, 50%), #ececec var(--pct, 50%));
+  }
+  .size-guide__slider-row input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #111; border: 0;
+  }
+  .size-guide__slider-row input[type='range']::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #111; border: 0; }
+  .size-guide__output { min-width: 64px; text-align: right; font-size: 15px; font-weight: 600; color: #555; }
+  .size-guide__result { margin-top: 22px; padding: 22px 24px; border-radius: 22px; background: #111; color: #fff; }
+  .size-guide__result-label { margin: 0 0 8px; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: #aaa; }
+  .size-guide__result-size { margin: 0 0 8px; font-size: 38px; line-height: 1.05; font-weight: 700; }
+  .size-guide__result-text { margin: 0; max-width: 34em; font-size: 15px; line-height: 1.55; color: #ddd; white-space: pre-line; }
+  @media (max-width: 749px) {
+    .size-guide__dialog { padding: 22px 18px; border-radius: 22px; }
+    .size-guide__stat-value { font-size: 36px; }
+    .size-guide__result-size { font-size: 32px; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Size recommendation",
+  "tag": null,
+  "blocks": [{ "type": "_size-rule" }],
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Add one 'Size rule' below for each height/weight range of THIS product. Without rules, visitors don't see this row."
+    },
+    { "type": "text", "id": "heading", "label": "Row title", "default": "SIZE RECOMMENDATION" },
+    { "type": "header", "content": "Pop-up texts" },
+    { "type": "text", "id": "eyebrow", "label": "Small title", "default": "SIZE RECOMMENDATION" },
+    { "type": "text", "id": "title", "label": "Title", "default": "What size should I wear?" },
+    {
+      "type": "textarea",
+      "id": "intro",
+      "label": "Intro text",
+      "default": "This is a recommendation based on statistics. If you already have a preferred size in mind, feel free to stick with it."
+    },
+    { "type": "text", "id": "height_label", "label": "Height box label", "default": "HEIGHT" },
+    { "type": "text", "id": "weight_label", "label": "Weight box label", "default": "WEIGHT" },
+    { "type": "text", "id": "adjust_height_label", "label": "Height slider label", "default": "ADJUST HEIGHT" },
+    { "type": "text", "id": "adjust_weight_label", "label": "Weight slider label", "default": "ADJUST WEIGHT" },
+    { "type": "text", "id": "result_label", "label": "Result label", "default": "RECOMMENDED SIZE" },
+    { "type": "text", "id": "or_word", "label": "Word between the two sizes", "default": "or" },
+    {
+      "type": "textarea",
+      "id": "fallback_text",
+      "label": "Text when no rule fits",
+      "default": "We couldn't find an exact match for these measurements. Check the size & fit details or message us at cenahelping@gmail.com."
+    },
+    { "type": "header", "content": "Sliders" },
+    { "type": "range", "id": "height_min", "label": "Minimum height", "min": 120, "max": 180, "step": 1, "unit": "cm", "default": 150 },
+    { "type": "range", "id": "height_max", "label": "Maximum height", "min": 180, "max": 230, "step": 1, "unit": "cm", "default": 210 },
+    { "type": "range", "id": "weight_min", "label": "Minimum weight", "min": 30, "max": 70, "step": 1, "unit": "kg", "default": 40 },
+    { "type": "range", "id": "weight_max", "label": "Maximum weight", "min": 90, "max": 180, "step": 1, "unit": "kg", "default": 130 },
+    { "type": "range", "id": "default_height", "label": "Starting height", "min": 130, "max": 220, "step": 1, "unit": "cm", "default": 175 },
+    { "type": "range", "id": "default_weight", "label": "Starting weight", "min": 35, "max": 150, "step": 1, "unit": "kg", "default": 70 },
+    {
+      "type": "range",
+      "id": "tolerance",
+      "label": "How far outside a rule still counts (cm + kg)",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "default": 10,
+      "info": "If the customer is further away than this from every rule, the 'no rule fits' text is shown."
+    }
+  ]
+}
+{% endschema %}

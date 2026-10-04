@@ -1,0 +1,72 @@
+{%- comment -%}
+  One sizing rule for the size recommendation pop-up: "if the customer is X cm / Y kg, suggest these two sizes".
+  Renders nothing visible; the parent block (_size-guide-row) reads these data attributes.
+{%- endcomment -%}
+<span
+  hidden
+  data-size-rule
+  data-height-from="{{ block.settings.height_from }}"
+  data-height-to="{{ block.settings.height_to }}"
+  data-weight-from="{{ block.settings.weight_from }}"
+  data-weight-to="{{ block.settings.weight_to }}"
+  data-size-1="{{ block.settings.size_1 | escape }}"
+  data-size-2="{{ block.settings.size_2 | escape }}"
+  data-text="{{ block.settings.text | escape }}"
+  {{ block.shopify_attributes }}
+></span>
+
+{% schema %}
+{
+  "name": "Size rule",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "If the customer's height AND weight fall inside these ranges, the pop-up suggests the two sizes below. Rules are checked from top to bottom; if none matches exactly, the closest one is used."
+    },
+    { "type": "header", "content": "Height (cm)" },
+    { "type": "range", "id": "height_from", "label": "From", "min": 120, "max": 220, "step": 1, "unit": "cm", "default": 170 },
+    { "type": "range", "id": "height_to", "label": "To", "min": 120, "max": 220, "step": 1, "unit": "cm", "default": 180 },
+    { "type": "header", "content": "Weight (kg)" },
+    { "type": "range", "id": "weight_from", "label": "From", "min": 30, "max": 150, "step": 1, "unit": "kg", "default": 60 },
+    { "type": "range", "id": "weight_to", "label": "To", "min": 30, "max": 150, "step": 1, "unit": "kg", "default": 75 },
+    { "type": "header", "content": "Recommendation" },
+    {
+      "type": "select",
+      "id": "size_1",
+      "label": "Best size",
+      "options": [
+        { "value": "XS", "label": "XS" },
+        { "value": "S", "label": "S" },
+        { "value": "M", "label": "M" },
+        { "value": "L", "label": "L" },
+        { "value": "XL", "label": "XL" },
+        { "value": "XXL", "label": "XXL" },
+        { "value": "One size", "label": "One size" }
+      ],
+      "default": "M"
+    },
+    {
+      "type": "select",
+      "id": "size_2",
+      "label": "Second option",
+      "options": [
+        { "value": "", "label": "None" },
+        { "value": "XS", "label": "XS" },
+        { "value": "S", "label": "S" },
+        { "value": "M", "label": "M" },
+        { "value": "L", "label": "L" },
+        { "value": "XL", "label": "XL" },
+        { "value": "XXL", "label": "XXL" }
+      ],
+      "default": "L"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text shown under the size",
+      "default": "Choose M for a structured, boxy fit, or L if you want more room."
+    }
+  ]
+}
+{% endschema %}
