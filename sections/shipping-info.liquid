@@ -1,0 +1,77 @@
+<div class="section-background color-{{ section.settings.color_scheme }}"></div>
+<div class="section page-width-content color-{{ section.settings.color_scheme }}">
+  <div class="shipping-info" style="padding-block: 40px 80px;">
+    <h1 class="shipping-info__title">SHIPPING</h1>
+
+    <p>As soon as you make the purchase, you will receive a confirmation e-mail and our team will get to work so that you receive your order as soon as possible.</p>
+
+    <p>If after the time indicated below for each country you have not received your order, please contact us indicating your order number and we will review your order history to find a solution as soon as possible.</p>
+
+    <p>Cena will not be responsible for delivery mistakes caused when the delivery address entered by the customer at the checkout does not correspond to the correct delivery address.</p>
+
+    <p>*During collection Drops, Black Friday Period and Christmas, due to high demand concentrated in a few days, it is possible that shipments may suffer some delays.</p>
+
+    <p>If you wish to cancel an order, you must notify Cena by emailing <a href="mailto:cenahelping@gmail.com">cenahelping@gmail.com</a>.<br>*Cancellations are only available for unfulfilled orders.</p>
+
+    <h2 class="shipping-info__heading">/ SHIPPING FEES:</h2>
+
+    <h3>Portugal (mainland)</h3>
+    <ul>
+      <li>STANDARD 3-5 DAYS | FREE</li>
+      <li>PRIORITY 1 DAY | 4,60€</li>
+    </ul>
+
+    <h3>Spain (mainland)</h3>
+    <ul>
+      <li>STANDARD 3-5 DAYS | 5,60€</li>
+    </ul>
+
+    <h3>United Kingdom</h3>
+    <ul>
+      <li>STANDARD 3-5 DAYS | 25£</li>
+    </ul>
+
+    <h3>*Rest of European Countries</h3>
+    <ul>
+      <li>STANDARD 3-5 DAYS | 20€</li>
+    </ul>
+
+    <p>* Austria, Belgium, Denmark, France, Germany, Netherlands, Croatia, Estonia, Lithuania, Slovakia, Slovenia.</p>
+
+    <p>We do not currently ship to countries that are not listed above.</p>
+
+    <p>Please note that all transit times are approximate and may vary. They should not be interpreted as exact delivery dates.</p>
+
+    <p>At all times Cena will work to offer the best service in terms of international shipments, however, it may happen that for some reason or cause beyond our control, an order may be canceled, in which case Cena will communicate it within a period not exceeding 24H working, accompanied by a refund in the method of payment used by the customer for the purchase.</p>
+
+    <h2 class="shipping-info__heading">/ CUSTOMS</h2>
+
+    <p>If, at any point during the delivery of your order, the shipping company requests a customs fee, please contact us at <a href="mailto:cenahelping@gmail.com">cenahelping@gmail.com</a>.</p>
+  </div>
+</div>
+
+{% stylesheet %}
+  .shipping-info { max-width: 800px; margin: 0 auto; line-height: 1.6; }
+  .shipping-info p { margin: 0 0 1.1em; }
+  .shipping-info__title { font-size: 28px; margin: 0 0 1em; text-transform: uppercase; }
+  .shipping-info__heading { font-size: 18px; margin: 2em 0 0.8em; text-transform: uppercase; }
+  .shipping-info h3 { font-size: 15px; margin: 1.4em 0 0.4em; }
+  .shipping-info ul { margin: 0 0 1em; padding-left: 1.2em; }
+  .shipping-info a { text-decoration: underline; }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Shipping info",
+  "class": "section-wrapper",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
+    }
+  ],
+  "presets": [{ "name": "Shipping info" }]
+}
+{% endschema %}
