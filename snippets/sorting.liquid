@@ -21,9 +21,19 @@
 >
   {% liquid
     assign default_sort_by = results.default_sort_by
+    assign allowed_sorts = 'created-descending,price-ascending,price-descending'
     for option in results.sort_options
       if option.value == sort_by
-        assign status = option.name
+        case option.value
+          when 'created-descending'
+            assign status = 'NEW IN'
+          when 'price-ascending'
+            assign status = 'PRICE ASCENDING'
+          when 'price-descending'
+            assign status = 'PRICE DESCENDING'
+          else
+            assign status = option.name
+        endcase
       endif
     endfor
   %}
@@ -45,13 +55,18 @@
         {% endif %}
       >
         {% for option in results.sort_options %}
+          {%- unless allowed_sorts contains option.value -%}{%- continue -%}{%- endunless -%}
           <option
             value="{{ option.value }}"
             {% if option.value == sort_by %}
               selected
             {% endif %}
           >
-            {{ option.name }}
+            {%- case option.value -%}
+              {%- when 'created-descending' -%}NEW IN
+              {%- when 'price-ascending' -%}PRICE ASCENDING
+              {%- when 'price-descending' -%}PRICE DESCENDING
+            {%- endcase -%}
           </option>
         {% endfor %}
       </select>
@@ -113,6 +128,7 @@
       >
         <div class="sorting-filter__options-inner">
           {% for option in results.sort_options %}
+            {%- unless allowed_sorts contains option.value -%}{%- continue -%}{%- endunless -%}
             <label
               for="sort-option-{{ option.value }}-{{ section_id }}"
             >
@@ -131,7 +147,7 @@
                   {% endif %}
                   value="{{ option.value }}"
                   class="sorting-filter__input"
-                  data-option-name="{{ option.name }}"
+                  data-option-name="{% case option.value %}{% when 'created-descending' %}NEW IN{% when 'price-ascending' %}PRICE ASCENDING{% when 'price-descending' %}PRICE DESCENDING{% endcase %}"
                   {% if option.value == sort_by %}
                     checked
                   {% endif %}
@@ -140,7 +156,13 @@
                 <span class="svg-wrapper icon-checkmark sorting-filter__checkmark">
                   {{- 'icon-checkmark.svg' | inline_asset_content -}}
                 </span>
-                <span class="sorting-filter__label">{{ option.name }}</span>
+                <span class="sorting-filter__label">
+                  {%- case option.value -%}
+                    {%- when 'created-descending' -%}NEW IN
+                    {%- when 'price-ascending' -%}PRICE ASCENDING
+                    {%- when 'price-descending' -%}PRICE DESCENDING
+                  {%- endcase -%}
+                </span>
               </div>
             </label>
           {% endfor %}
@@ -151,6 +173,10 @@
 </sorting-filter-component>
 
 {% stylesheet %}
+  .sorting-filter__options { border-radius: 0; box-shadow: 0 8px 24px rgb(0 0 0 / 12%); }
+  .sorting-filter__option { min-width: 220px; padding: 12px 16px; letter-spacing: 0.4px; font-size: 13px; text-transform: uppercase; }
+  .sorting-filter__option:hover { border-radius: 0; }
+  .sorting-filter__input:checked + .sorting-filter__checkmark + .sorting-filter__label { font-weight: 700; }
   .sorting-filter__container {
     display: flex;
     align-items: center;

@@ -119,6 +119,15 @@
 
     {% render 'newsletter-popup' %}
     {%- render 'klaviyo-signup' -%}
+    <script>
+      // "Shop all" always opens sorted by price, highest first (unless the visitor picked another order)
+      (function () {
+        var m = location.pathname.match(/^(\/[a-z]{2}(?:-[a-z]{2})?)?\/collections\/all\/?$/i);
+        if (!m || /[?&]sort_by=/.test(location.search)) return;
+        var q = location.search ? location.search + '&' : '?';
+        location.replace(location.pathname + q + 'sort_by=price-descending' + location.hash);
+      })();
+    </script>
 
     {% if settings.quick_add or settings.mobile_quick_add %}
       {% render 'quick-add-modal' %}
