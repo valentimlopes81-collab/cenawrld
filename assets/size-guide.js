@@ -46,7 +46,7 @@ if (!customElements.get('size-guide')) {
 
     readRules() {
       const num = (v) => (v === '' || v == null ? NaN : Number(v));
-      return Array.from(this.querySelectorAll('[data-size-rule]')).map((el) => ({
+      const own = Array.from(this.querySelectorAll('[data-size-rule]')).map((el) => ({
         hf: num(el.dataset.heightFrom),
         ht: num(el.dataset.heightTo),
         wf: num(el.dataset.weightFrom),
@@ -55,6 +55,26 @@ if (!customElements.get('size-guide')) {
         s2: el.dataset['size-2'] || '',
         text: el.dataset.text || '',
       }));
+      // product-specific "Size rule" blocks win; otherwise use the generic chart
+      return own.length ? own : this.readGenericRules();
+    }
+
+    /** Lines like "168-176 | 65-78 | M | L | optional text". */
+    readGenericRules() {
+      const range = (v) => {
+        const [a, b] = String(v || '').split('-').map((n) => parseFloat(n));
+        return [a, Number.isNaN(b) ? a : b];
+      };
+      return (this.dataset.genericRules || '')
+        .split(/\r?\n/)
+        .map((line) => line.split('|').map((p) => p.trim()))
+        .filter((p) => p.length >= 3 && p[0] && p[1] && p[2])
+        .map((p) => {
+          const [hf, ht] = range(p[0]);
+          const [wf, wt] = range(p[1]);
+          return { hf, ht, wf, wt, s1: p[2], s2: p[3] || '', text: p.slice(4).join('|').trim() };
+        })
+        .filter((r) => [r.hf, r.ht, r.wf, r.wt].every((n) => !Number.isNaN(n)));
     }
 
     open() {

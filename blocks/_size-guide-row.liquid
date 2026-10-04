@@ -32,6 +32,7 @@
   data-tolerance="{{ s.tolerance }}"
   data-or="{{ s.or_word | escape }}"
   data-fallback="{{ s.fallback_text | escape }}"
+  data-generic-rules="{{ s.generic_rules | escape }}"
 >
   <div hidden>{% content_for 'blocks' %}</div>
 
@@ -156,6 +157,14 @@
       "id": "fallback_text",
       "label": "Text when no rule fits",
       "default": "We couldn't find an exact match for these measurements. Check the size & fit details or message us at cenahelping@gmail.com."
+    },
+    { "type": "header", "content": "Generic size chart" },
+    {
+      "type": "textarea",
+      "id": "generic_rules",
+      "label": "Generic rules (used when this product has no \"Size rule\" blocks)",
+      "info": "One rule per line: height range | weight range | size 1 | size 2 | optional text. Example: 168-176 | 65-78 | M | L | Oversized fit.",
+      "default": "150-160 | 40-55 | XS | S | Oversized fit: size down for a closer fit.\n155-168 | 50-65 | S | M | Oversized fit: size down for a closer fit.\n160-170 | 55-68 | S | M | Relaxed, slightly oversized fit.\n168-176 | 65-78 | M | L | Relaxed, slightly oversized fit.\n174-182 | 72-85 | M | L | Relaxed, slightly oversized fit.\n180-188 | 80-92 | L | XL | Roomy fit: size down if you prefer it fitted.\n186-194 | 88-100 | XL | XXL | Roomy fit: size down if you prefer it fitted.\n192-210 | 95-130 | XXL | | Roomy fit: size down if you prefer it fitted."
     },
     { "type": "header", "content": "Sliders" },
     { "type": "range", "id": "height_min", "label": "Minimum height", "min": 120, "max": 180, "step": 1, "unit": "cm", "default": 150 },
