@@ -22,7 +22,7 @@
   "settings": [
     {
       "type": "paragraph",
-      "content": "If the customer's height AND weight fall inside these ranges, the pop-up suggests the two sizes below. Rules are checked from top to bottom; if none matches exactly, the closest one is used."
+      "content": "If height and weight fall inside these ranges, the two sizes below are suggested. If no rule matches, the closest one is used."
     },
     { "type": "header", "content": "Height (cm)" },
     { "type": "range", "id": "height_from", "label": "From", "min": 120, "max": 220, "step": 1, "unit": "cm", "default": 170 },
@@ -66,6 +66,11 @@
       "id": "text",
       "label": "Text shown under the size",
       "default": "Choose M for a structured, boxy fit, or L if you want more room."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Size rule"
     }
   ]
 }

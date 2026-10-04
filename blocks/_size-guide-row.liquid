@@ -133,7 +133,7 @@
   "settings": [
     {
       "type": "paragraph",
-      "content": "Add one 'Size rule' below for each height/weight range of THIS product. Without rules the pop-up shows the 'no rule fits' text."
+      "content": "Add one Size rule per height/weight range of this product."
     },
     { "type": "text", "id": "heading", "label": "Row title", "default": "SIZE GUIDE" },
     { "type": "header", "content": "Pop-up texts" },
@@ -167,12 +167,17 @@
     {
       "type": "range",
       "id": "tolerance",
-      "label": "How far outside a rule still counts (cm + kg)",
+      "label": "Match tolerance (cm + kg)",
       "min": 0,
       "max": 40,
       "step": 1,
       "default": 10,
-      "info": "If the customer is further away than this from every rule, the 'no rule fits' text is shown."
+      "info": "Further away than this from every rule: the no-match text is shown."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Size recommendation"
     }
   ]
 }

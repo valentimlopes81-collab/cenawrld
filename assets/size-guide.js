@@ -1,5 +1,5 @@
 /**
- * Size recommendation pop-up. Reads the "Size rule" blocks, then updates the recommended sizes live
+ * Size recommendation pop-up. (v2) Reads the "Size rule" blocks, then updates the recommended sizes live
  * as the customer moves the height and weight sliders.
  */
 if (!customElements.get('size-guide')) {
