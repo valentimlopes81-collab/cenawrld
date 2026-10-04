@@ -688,9 +688,23 @@ main[data-template="product"] :is(button, .button) {
   max-width: 800px;
   margin: 0 auto;
   padding: 60px 20px;
+  background: #fff;
+  color: #000;
 }
 .shopify-policy__title {
-  display: none !important;
+  display: block !important;
+  text-align: center;
+  text-transform: uppercase;
+  color: #000;
+}
+.shopify-policy__title h1 {
+  font-size: var(--font-size--xl, 1.5rem);
+  color: #000;
+}
+.shopify-policy__body,
+.shopify-policy__body *,
+.shopify-policy__body a {
+  color: #000 !important;
 }
 .shopify-policy__body,
 .shopify-policy__body p,
