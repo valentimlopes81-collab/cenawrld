@@ -344,6 +344,8 @@
           {% endif %}
           {% if block_settings.caption_text != blank and forloop.index == block_settings.caption_image_index %}
             <p class="product-media-caption">{{ block_settings.caption_text }}</p>
+          {% elsif block_settings.caption_text_2 != blank and forloop.index == block_settings.caption_image_index_2 %}
+            <p class="product-media-caption">{{ block_settings.caption_text_2 }}</p>
           {% endif %}
         {% endcapture %}
         {% capture class %}
@@ -425,8 +427,13 @@
       >
         {% for media in sorted_media %}
           {% assign has_caption = false %}
+          {% assign caption_for_media = '' %}
           {% if block_settings.caption_text != blank and forloop.index == block_settings.caption_image_index %}
             {% assign has_caption = true %}
+            {% assign caption_for_media = block_settings.caption_text %}
+          {% elsif block_settings.caption_text_2 != blank and forloop.index == block_settings.caption_image_index_2 %}
+            {% assign has_caption = true %}
+            {% assign caption_for_media = block_settings.caption_text_2 %}
           {% endif %}
           <li
             id="media-gallery-item-{{ block_id }}-{{ forloop.index0 }}"
@@ -462,7 +469,7 @@
               {%- render 'product-media', media: media, sizes: media_sizes, is_main_product_media: forloop.first -%}
             {% endif %}
             {% if has_caption %}
-              <p class="product-media-caption">{{ block_settings.caption_text }}</p>
+              <p class="product-media-caption">{{ caption_for_media }}</p>
             {% endif %}
           </li>
         {% endfor %}

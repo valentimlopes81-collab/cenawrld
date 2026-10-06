@@ -303,6 +303,22 @@
       "visible_if": "{{ block.settings.caption_text != blank }}"
     },
     {
+      "type": "text",
+      "id": "caption_text_2",
+      "label": "Second caption text",
+      "info": "Optional caption for a second photo (e.g. another model)."
+    },
+    {
+      "type": "range",
+      "id": "caption_image_index_2",
+      "label": "Which photo gets the second caption",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 4,
+      "visible_if": "{{ block.settings.caption_text_2 != blank }}"
+    },
+    {
       "type": "header",
       "content": "t:content.padding"
     },
