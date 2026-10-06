@@ -1,0 +1,201 @@
+{%- comment -%}
+  WHAT IS CENA? page. Black page, white text, three photos alternating with the story, signature at the end.
+  Every photo falls back to the files in /assets until you pick another one in the theme editor.
+{%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign banner_url = 'banner-desktop.jpg' | asset_url
+  assign photo_2_url = 'what-is-cena-stickers.webp' | asset_url
+  assign photo_3_url = 'popup-bg.jpg' | asset_url
+  assign signature_url = 'cena-signature.png' | asset_url
+-%}
+
+<div
+  class="what-is-cena"
+  style="
+    --wic-bg: {{ s.background_color }};
+    --wic-fg: {{ s.text_color }};
+    --wic-size: {{ s.text_size }}px;
+    --wic-size-mobile: {{ s.text_size_mobile }}px;
+    --wic-gap: {{ s.row_gap }}px;
+    --wic-space: {{ s.section_space }}px;
+    --wic-banner-w: {{ s.banner_width }}px;
+    --wic-radius: {{ s.photo_radius }}px;
+    --wic-highlight: {{ s.highlight_size }}px;
+    --wic-highlight-mobile: {{ s.highlight_size_mobile }}px;
+    --wic-sign-w: {{ s.signature_width }}px;
+    --wic-text-align: {{ s.text_alignment }};
+  "
+>
+  {%- comment -%} 1. Banner photo, centered on top {%- endcomment -%}
+  <div class="wic__banner">
+    {%- if s.banner_image != blank -%}
+      {{ s.banner_image | image_url: width: 2400 | image_tag: loading: 'eager', widths: '600, 1000, 1400, 2000, 2400', sizes: '100vw', alt: s.banner_image.alt | default: 'CENA' }}
+    {%- else -%}
+      <img src="{{ banner_url }}" alt="CENA" loading="eager">
+    {%- endif -%}
+  </div>
+
+  {%- comment -%} 2. Text left, photo right {%- endcomment -%}
+  <div class="wic__row">
+    <div class="wic__text">{{ s.text_1 }}</div>
+    <div class="wic__photo">
+      {%- if s.photo_2 != blank -%}
+        {{ s.photo_2 | image_url: width: 1600 | image_tag: loading: 'lazy', widths: '500, 800, 1200, 1600', sizes: '(min-width: 750px) 50vw, 100vw', alt: s.photo_2.alt | default: 'CENA' }}
+      {%- else -%}
+        <img src="{{ photo_2_url }}" alt="CENA stickers" loading="lazy">
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- comment -%} 3. Photo left, text right {%- endcomment -%}
+  <div class="wic__row wic__row--reverse">
+    <div class="wic__photo">
+      {%- if s.photo_3 != blank -%}
+        {{ s.photo_3 | image_url: width: 1600 | image_tag: loading: 'lazy', widths: '500, 800, 1200, 1600', sizes: '(min-width: 750px) 50vw, 100vw', alt: s.photo_3.alt | default: 'CENA' }}
+      {%- else -%}
+        <img src="{{ photo_3_url }}" alt="CENA" loading="lazy">
+      {%- endif -%}
+    </div>
+    <div class="wic__text">{{ s.text_2 }}</div>
+  </div>
+
+  {%- comment -%} Ending, centered {%- endcomment -%}
+  <div class="wic__end">
+    {%- if s.highlight_text != blank -%}<p class="wic__highlight">{{ s.highlight_text }}</p>{%- endif -%}
+    <div class="wic__closing">{{ s.closing_text }}</div>
+    <img
+      class="wic__signature"
+      src="{%- if s.signature_image != blank -%}{{ s.signature_image | image_url: width: 800 }}{%- else -%}{{ signature_url }}{%- endif -%}"
+      alt="CENA"
+      loading="lazy"
+    >
+    {%- if s.show_final_dot -%}<p class="wic__dot" aria-hidden="true">.</p>{%- endif -%}
+  </div>
+</div>
+
+<style>
+  /* The whole page is black behind this section (also the strip under the floating header) */
+  #MainContent:has(.what-is-cena) { background: {{ s.background_color }}; }
+</style>
+
+{% stylesheet %}
+  .what-is-cena {
+    background: var(--wic-bg);
+    color: var(--wic-fg);
+    font-family: var(--font-body--family, sans-serif);
+    padding: 0 20px var(--wic-space);
+    box-sizing: border-box;
+  }
+  .what-is-cena * { box-sizing: border-box; }
+
+  .wic__banner { max-width: var(--wic-banner-w); margin: 0 auto var(--wic-space); }
+  .wic__banner img, .wic__photo img { display: block; width: 100%; height: auto; border-radius: var(--wic-radius); }
+
+  .wic__row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 28px;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto var(--wic-space);
+  }
+  @media (min-width: 750px) {
+    .wic__row { grid-template-columns: 1fr 1fr; gap: var(--wic-gap); }
+  }
+
+  .wic__text {
+    font-size: var(--wic-size-mobile);
+    line-height: 1.7;
+    text-align: var(--wic-text-align);
+    letter-spacing: 0.2px;
+  }
+  .wic__text p, .wic__closing p { margin: 0 0 1.4em; }
+  .wic__text p:last-child { margin-bottom: 0; }
+  @media (min-width: 750px) {
+    .wic__text { font-size: var(--wic-size); }
+  }
+  .wic__text a, .wic__closing a { color: inherit; text-decoration: underline; }
+
+  .wic__end { text-align: center; max-width: 900px; margin: 0 auto; }
+  .wic__highlight {
+    margin: 0 0 1.4em;
+    font-size: var(--wic-highlight-mobile);
+    font-weight: 700;
+    line-height: 1.1;
+  }
+  @media (min-width: 750px) {
+    .wic__highlight { font-size: var(--wic-highlight); }
+  }
+  .wic__closing { font-size: var(--wic-size-mobile); line-height: 1.7; }
+  @media (min-width: 750px) { .wic__closing { font-size: var(--wic-size); } }
+  .wic__closing p { margin: 0; }
+  .wic__signature { display: block; width: min(var(--wic-sign-w), 80%); height: auto; margin: 10px auto 0; }
+  .wic__dot {
+    width: 12px; height: 12px; margin: 22px auto 0; border-radius: 50%; background: currentColor;
+    font-size: 0; line-height: 0; overflow: hidden;
+  }
+  @media (max-width: 749px) {
+    .what-is-cena { padding-bottom: calc(var(--wic-space) * 0.6); }
+    .wic__banner, .wic__row { margin-bottom: calc(var(--wic-space) * 0.6); }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "WHAT IS CENA?",
+  "settings": [
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "id": "background_color", "label": "Background", "default": "#000000" },
+    { "type": "color", "id": "text_color", "label": "Text", "default": "#ffffff" },
+
+    { "type": "header", "content": "Photos" },
+    { "type": "image_picker", "id": "banner_image", "label": "Top photo (banner)", "info": "Leave empty to use the site banner." },
+    { "type": "range", "id": "banner_width", "label": "Top photo maximum width", "min": 500, "max": 2000, "step": 50, "unit": "px", "default": 1100 },
+    { "type": "image_picker", "id": "photo_2", "label": "Second photo (right)", "info": "Leave empty to use the stickers photo." },
+    { "type": "image_picker", "id": "photo_3", "label": "Third photo (left)", "info": "Leave empty to use the pop-up photo." },
+    { "type": "range", "id": "photo_radius", "label": "Rounded corners", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 0 },
+
+    { "type": "header", "content": "Text" },
+    {
+      "type": "richtext",
+      "id": "text_1",
+      "label": "Text next to the second photo",
+      "default": "<p>trouble always finds us. we felt out of place, disconnected. nobody ever understood our goals and our dreams, they called them unrealistic. nobody ever had our vision.</p><p>so i took refuge in the effort, in the hustle, in fashion, in art. i've always been addicted to creating, addicted to sweating, addicted to overcoming. we've always stayed loyal to those who believed in our vision. we always wanted something more.</p>"
+    },
+    {
+      "type": "richtext",
+      "id": "text_2",
+      "label": "Text next to the third photo",
+      "default": "<p>today i tell my story without words. each piece is a page left unwritten, a part of me i want to tell.</p><p>today the vehicle of my mind is the touch of the fabric, the cut, the design, the process. feeding the streets its all about giving back to those u fell us, and connect with our beliefs and i manifest a movement that carries the values of the street and resilience in its veins, far beyond clothing.</p>"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    { "type": "range", "id": "text_size", "label": "Text size (desktop)", "min": 12, "max": 36, "step": 1, "unit": "px", "default": 20 },
+    { "type": "range", "id": "text_size_mobile", "label": "Text size (mobile)", "min": 12, "max": 28, "step": 1, "unit": "px", "default": 16 },
+
+    { "type": "header", "content": "Ending" },
+    { "type": "text", "id": "highlight_text", "label": "Highlighted phrase", "default": "welcome to the cult" },
+    { "type": "range", "id": "highlight_size", "label": "Highlight size (desktop)", "min": 20, "max": 120, "step": 2, "unit": "px", "default": 56 },
+    { "type": "range", "id": "highlight_size_mobile", "label": "Highlight size (mobile)", "min": 16, "max": 64, "step": 2, "unit": "px", "default": 32 },
+    { "type": "richtext", "id": "closing_text", "label": "Closing text", "default": "<p>with sincere love,<br/>the cena family</p>" },
+    { "type": "image_picker", "id": "signature_image", "label": "Signature", "info": "Leave empty to use the CENA signature." },
+    { "type": "range", "id": "signature_width", "label": "Signature width", "min": 100, "max": 600, "step": 10, "unit": "px", "default": 300 },
+    { "type": "checkbox", "id": "show_final_dot", "label": "Show the final dot", "default": true },
+
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "row_gap", "label": "Space between photo and text (desktop)", "min": 16, "max": 160, "step": 4, "unit": "px", "default": 64 },
+    { "type": "range", "id": "section_space", "label": "Space between parts", "min": 24, "max": 200, "step": 4, "unit": "px", "default": 80 }
+  ],
+  "presets": [{ "name": "WHAT IS CENA?" }]
+}
+{% endschema %}
