@@ -71,7 +71,6 @@
         alt="CENA"
         loading="lazy"
       >
-      {%- if s.show_final_dot -%}<span class="wic__dot" aria-hidden="true"></span>{%- endif -%}
     </div>
   </div>
 </div>
@@ -134,11 +133,6 @@
   .wic__closing p { margin: 0; }
   .wic__sign { position: relative; width: min(var(--wic-sign-w), 80%); margin: 10px auto 0; }
   .wic__signature { display: block; width: 100%; height: auto; }
-  /* final dot, right next to the end of the signature */
-  .wic__dot {
-    position: absolute; left: 90%; top: 61%;
-    width: 7px; height: 7px; border-radius: 50%; background: currentColor;
-  }
   @media (max-width: 749px) {
     .what-is-cena { padding-bottom: calc(var(--wic-space) * 0.6); }
     .wic__banner, .wic__row { margin-bottom: calc(var(--wic-space) * 0.6); }
@@ -194,7 +188,6 @@
     { "type": "richtext", "id": "closing_text", "label": "Closing text", "default": "<p>with sincere love,<br/>the cena family</p>" },
     { "type": "image_picker", "id": "signature_image", "label": "Signature", "info": "Leave empty to use the CENA signature." },
     { "type": "range", "id": "signature_width", "label": "Signature width", "min": 100, "max": 600, "step": 10, "unit": "px", "default": 200 },
-    { "type": "checkbox", "id": "show_final_dot", "label": "Show the final dot", "default": true },
 
     { "type": "header", "content": "Spacing" },
     { "type": "range", "id": "row_gap", "label": "Space between photo and text (desktop)", "min": 16, "max": 160, "step": 4, "unit": "px", "default": 64 },
