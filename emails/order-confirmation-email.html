@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark light" />
+  <title>Your CENA order</title>
+  <style type="text/css">
+    body { margin: 0; padding: 0; background: #000000; }
+    img { border: 0; display: block; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; }
+    a { text-decoration: none; }
+    @media only screen and (max-width: 620px) {
+      .wrap { width: 100% !important; }
+      .pad { padding-left: 20px !important; padding-right: 20px !important; }
+      .h1 { font-size: 34px !important; line-height: 38px !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background:#000000;">
+<!--
+  PARA O FLUXO "PLACED ORDER" (quando alguem faz uma encomenda).
+  ANTES DE USAR: troca "https://TROCA-ESTE-URL/cena-signature.png" pelo URL da assinatura no Klaviyo
+  (emails/images/cena-signature.png > carregar em Conteudo > Biblioteca de imagens).
+  As variaveis {{ ... }} so funcionam dentro de um fluxo com o gatilho "Placed Order" (Shopify).
+  Para testar: Pre-visualizar > "Pre-visualizar como perfil" e escolhe alguem com uma encomenda recente.
+-->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#000000;">
+  <tr><td align="center" style="padding:24px 10px;">
+
+    <table role="presentation" class="wrap" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;background:#000000;">
+
+      <!-- Logo -->
+      <tr><td align="center" style="padding:8px 0 28px;">
+        <a href="https://cenawrld.com"><img src="https://cdn.klaviyomail.com/company/TiTvcE/images/0b4c76d1-fd73-4475-9a79-f0e34c704e9e.png" alt="CENA" width="120" style="width:120px;height:auto;margin:0 auto;" /></a>
+      </td></tr>
+
+      <!-- Title -->
+      <tr><td class="pad" align="center" style="padding:0 40px;">
+        <h1 class="h1" style="margin:0 0 12px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:44px;line-height:46px;font-weight:800;letter-spacing:-1px;color:#ffffff;text-transform:uppercase;">Order received</h1>
+        <p style="margin:0 0 28px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;line-height:22px;color:#bdbdbd;">Thank you{% if first_name %}, {{ first_name }}{% endif %}. We're getting your pieces ready.</p>
+      </td></tr>
+
+      <!-- Order pill -->
+      <tr><td align="center" style="padding:0 40px 32px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+          <td align="center" style="border:1px solid #ffffff;border-radius:999px;padding:12px 28px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;color:#ffffff;text-transform:uppercase;">Welcome to the cult</td>
+        </tr></table>
+      </td></tr>
+
+      <!-- Items -->
+      <tr><td class="pad" style="padding:0 40px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #333333;">
+          {% for item in event.extra.line_items %}
+          <tr>
+            <td width="84" valign="top" style="padding:18px 16px 18px 0;border-bottom:1px solid #333333;">
+              <img src="{{ item.product.images.base }}" alt="{{ item.product.title }}" width="84" style="width:84px;height:auto;" />
+            </td>
+            <td valign="top" style="padding:18px 0;border-bottom:1px solid #333333;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#ffffff;">
+              <div style="font-size:14px;line-height:20px;font-weight:700;text-transform:uppercase;">{{ item.product.title }}</div>
+              {% if item.variant.title %}<div style="font-size:13px;line-height:20px;color:#bdbdbd;">{{ item.variant.title }}</div>{% endif %}
+              <div style="font-size:13px;line-height:20px;color:#bdbdbd;">Qty: {{ item.quantity }}</div>
+            </td>
+            <td width="90" align="right" valign="top" style="padding:18px 0;border-bottom:1px solid #333333;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:20px;font-weight:700;color:#ffffff;">
+              &euro;{{ item.line_price|floatformat:2 }}
+            </td>
+          </tr>
+          {% endfor %}
+        </table>
+      </td></tr>
+
+      <!-- Total -->
+      <tr><td class="pad" style="padding:20px 40px 0;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+          <td style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;line-height:22px;font-weight:800;text-transform:uppercase;color:#ffffff;">Total</td>
+          <td align="right" style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;line-height:22px;font-weight:800;color:#ffffff;">&euro;{{ event.value|floatformat:2 }}</td>
+        </tr></table>
+      </td></tr>
+
+      <!-- Shipping address -->
+      <tr><td class="pad" style="padding:32px 40px 0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#ffffff;">
+        <div style="font-size:13px;line-height:20px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#bdbdbd;">Shipping to</div>
+        <div style="padding-top:6px;font-size:14px;line-height:22px;">
+          {{ event.extra.shipping_address.first_name }} {{ event.extra.shipping_address.last_name }}<br />
+          {{ event.extra.shipping_address.address1 }}{% if event.extra.shipping_address.address2 %}, {{ event.extra.shipping_address.address2 }}{% endif %}<br />
+          {{ event.extra.shipping_address.zip }} {{ event.extra.shipping_address.city }}<br />
+          {{ event.extra.shipping_address.country }}
+        </div>
+      </td></tr>
+
+      <!-- Delivery info -->
+      <tr><td class="pad" style="padding:28px 40px 0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:23px;color:#d6d6d6;">
+        You'll get another email with your tracking link as soon as your order ships. Standard delivery takes <strong style="color:#ffffff;">3-5 days</strong>. During drops, Black Friday and Christmas, high demand may cause some delays.
+      </td></tr>
+
+      <!-- Button -->
+      <tr><td align="center" style="padding:30px 40px 0;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+          <td align="center" style="background:#ffffff;border-radius:999px;">
+            <a href="{{ event.extra.order_status_url|default:'https://cenawrld.com' }}" style="display:inline-block;padding:16px 40px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;font-weight:800;letter-spacing:0.5px;color:#000000;text-transform:uppercase;">View your order</a>
+          </td>
+        </tr></table>
+      </td></tr>
+
+      <!-- Help -->
+      <tr><td class="pad" align="center" style="padding:28px 40px 0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;line-height:21px;color:#bdbdbd;">
+        Need help? Write to <a href="mailto:cenahelping@gmail.com" style="color:#ffffff;text-decoration:underline;">cenahelping@gmail.com</a> with your order number.
+      </td></tr>
+
+      <!-- Closing + signature -->
+      <tr><td class="pad" align="center" style="padding:40px 40px 0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;line-height:24px;color:#ffffff;">
+        with sincere love,<br />the cena family
+      </td></tr>
+      <tr><td align="center" style="padding:12px 40px 36px;">
+        <img src="https://TROCA-ESTE-URL/cena-signature.png" alt="CENA" width="160" style="width:160px;height:auto;margin:0 auto;" />
+      </td></tr>
+
+      <!-- Social -->
+      <tr><td align="center" style="padding:0 40px 24px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+          <td style="padding:0 16px;"><a href="https://www.instagram.com/cena.wrld"><img src="https://cdn.klaviyomail.com/company/TiTvcE/images/10475927-6067-4148-b36f-2fa4e8bd3383.png" alt="Instagram" width="40" height="40" style="width:40px;height:40px;" /></a></td>
+          <td style="padding:0 16px;"><a href="https://www.tiktok.com/@cena_wrld"><img src="https://cdn.klaviyomail.com/company/TiTvcE/images/4a94dd13-3394-456d-96ec-ca29676a163f.png" alt="TikTok" width="40" height="40" style="width:40px;height:40px;" /></a></td>
+        </tr></table>
+      </td></tr>
+
+      <!-- Footer -->
+      <tr><td class="pad" align="center" style="padding:0 40px 16px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;line-height:17px;color:#777777;">
+        You're receiving this email because you placed an order at cenawrld.com.<br />
+        {{ organization.full_address }}<br />
+        {% unsubscribe %}
+      </td></tr>
+
+    </table>
+
+  </td></tr>
+</table>
+</body>
+</html>
