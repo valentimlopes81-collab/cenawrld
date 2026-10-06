@@ -3,10 +3,10 @@
   <!-- Header Desktop -->
   <div class="header-wrapper">
     
-    <!-- Left menu (Shop All) -->
+    <!-- Left menu (SHOP) -->
     <nav class="menu-left">
       <ul>
-        <li><a href="{{ routes.all_products_collection_url }}?sort_by=price-descending">Shop All</a></li>
+        <li><a href="{{ routes.all_products_collection_url }}?sort_by=price-descending">SHOP</a></li>
       </ul>
     </nav>
 
@@ -97,7 +97,7 @@
 <!-- Mobile nav dropdown (opens from the header) -->
 <div class="mobile-nav-dropdown">
   <ul>
-    <li><a href="{{ routes.all_products_collection_url }}?sort_by=price-descending">Shop All</a></li>
+    <li><a href="{{ routes.all_products_collection_url }}?sort_by=price-descending">SHOP</a></li>
   </ul>
 </div>
 
@@ -675,6 +675,13 @@ main[data-template="product"] :is(button, .button) {
   #MainContent[data-template="index"] .hero__image--desktop {
     content: url('{{ "hero-desktop.jpg" | asset_url }}') !important;
   }
+}
+
+/* Product cards (Shop all, related products, carousels): show the whole photo, never crop it */
+.card-gallery :is(img, video),
+.card-gallery .product-media :is(img, video) {
+  object-fit: contain !important;
+  background: #fff;
 }
 
 /* Shopify's default policy pages (Refund, Shipping, Privacy, Terms):
