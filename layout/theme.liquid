@@ -122,6 +122,8 @@
     <script>
       // "Shop all" always opens sorted by price, highest first (unless the visitor picked another order)
       (function () {
+        // search engine bots stay on the clean /collections/all URL so it can be indexed
+        if (/bot|crawl|spider|slurp|googlebot|bingbot|lighthouse/i.test(navigator.userAgent)) return;
         var m = location.pathname.match(/^(\/[a-z]{2}(?:-[a-z]{2})?)?\/collections\/all\/?$/i);
         if (!m || /[?&]sort_by=/.test(location.search)) return;
         var q = location.search ? location.search + '&' : '?';
