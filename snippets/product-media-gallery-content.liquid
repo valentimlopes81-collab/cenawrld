@@ -185,6 +185,9 @@
     type="module"
   ></script>
 {%- endif -%}
+{%- if block_settings.mobile_fit_photos != blank -%}
+  <script src="{{ 'product-photo-fit.js' | asset_url }}" defer></script>
+{%- endif -%}
 
 {% style %}
   {% unless block_settings.aspect_ratio == 'adapt' %}
@@ -349,21 +352,21 @@
           {% endif %}
         {% endcapture %}
         {%- liquid
-          assign mobile_zoomed = false
-          if block_settings.mobile_zoom_photos != blank
-            assign mobile_zoom_list = block_settings.mobile_zoom_photos | remove: ' ' | split: ','
+          assign photo_fit = false
+          if block_settings.mobile_fit_photos != blank
+            assign photo_fit_list = block_settings.mobile_fit_photos | remove: ' ' | split: ','
             assign slide_number = forloop.index | append: ''
-            if mobile_zoom_list contains slide_number
-              assign mobile_zoomed = true
+            if photo_fit_list contains slide_number
+              assign photo_fit = true
             endif
           endif
         -%}
         {% capture class %}
-          {{ product_media_container_class }} product-media-container--{{ media.media_type }}{% if block_settings.zoom %} product-media-container--zoomable{% endif %}{% if forloop.index0 == lowest_aspect_ratio_index and block_settings.aspect_ratio == 'adapt' %} product-media-container--tallest{% endif %}{% if mobile_zoomed %} product-media-container--mobile-zoom{% endif %}
+          {{ product_media_container_class }} product-media-container--{{ media.media_type }}{% if block_settings.zoom %} product-media-container--zoomable{% endif %}{% if forloop.index0 == lowest_aspect_ratio_index and block_settings.aspect_ratio == 'adapt' %} product-media-container--tallest{% endif %}
         {% endcapture %}
         {% if block_settings.aspect_ratio == 'adapt' %}
           {% capture style %}
-            --media-preview-ratio: {{ media.preview_image.aspect_ratio | default: 1.0 }};{% if mobile_zoomed %} --mobile-zoom: {{ block_settings.mobile_zoom_percent | divided_by: 100.0 }}; --mobile-zoom-y: {{ block_settings.mobile_zoom_focus }}%;{% endif %}
+            --media-preview-ratio: {{ media.preview_image.aspect_ratio | default: 1.0 }};
           {% endcapture %}
         {% endif %}
         {% if block_settings.zoom and media.media_type == 'model' %}
@@ -372,12 +375,19 @@
           {%- capture attributes -%}on:click="#zoom-dialog-{{ block_id }}/open/{{ forloop.index0 }}"{% if settings.transition_to_main_product and forloop.first %} data-view-transition-type="product-image-transition"{% endif %}{% endcapture -%}
         {% endif %}
 
+        {%- liquid
+          assign slide_attributes = attributes
+          if photo_fit
+            assign fit_attributes = ' data-photo-fit data-fit-width="' | append: block_settings.mobile_fit_width | append: '" data-fit-bottom="' | append: block_settings.mobile_fit_bottom | append: '"'
+            assign slide_attributes = attributes | append: fit_attributes
+          endif
+        -%}
         {% render 'slideshow-slide',
           index: forloop.index0,
           children: children,
           class: class,
           style: style,
-          attributes: attributes,
+          attributes: slide_attributes,
           media_fit: block_settings.media_fit,
         %}
       {% endfor %}
@@ -884,11 +894,25 @@
     height: 100vh;
   }
 
-  /* Mobile-only enlarge for chosen photos (set per gallery in the theme editor) */
+  /* Mobile only: photos listed in "Photos to fit on mobile" are measured by product-photo-fit.js and then
+     positioned here, so the person fills the slide width and rests on the bottom edge. */
   @media screen and (max-width: 749px) {
-    :not(.dialog-zoomed-gallery) > .product-media-container--mobile-zoom .product-media__image {
-      transform: scale(var(--mobile-zoom, 1));
-      transform-origin: 50% var(--mobile-zoom-y, 50%);
+    slideshow-slide[data-fit-ready] .product-media {
+      position: relative;
+      align-self: stretch;
+      overflow: hidden;
+    }
+
+    slideshow-slide[data-fit-ready] .product-media__image {
+      position: absolute;
+      bottom: 0;
+      left: calc(50% - var(--fit-cx) * var(--fit-k) * 100%);
+      width: calc(var(--fit-k) * 100%);
+      max-width: none;
+      height: auto;
+      aspect-ratio: auto;
+      object-fit: fill;
+      transform: translateY(calc((1 - var(--fit-y1)) * 100% - var(--fit-bottom, 0px)));
     }
   }
 {% endstylesheet %}

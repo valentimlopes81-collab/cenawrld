@@ -320,36 +320,37 @@
     },
     {
       "type": "header",
-      "content": "Mobile photo zoom"
+      "content": "Mobile photo fit"
     },
     {
       "type": "text",
-      "id": "mobile_zoom_photos",
-      "label": "Photos to enlarge on mobile",
-      "info": "Photo numbers separated by commas, e.g. 1,2. Leave blank for none. Desktop never changes."
+      "id": "mobile_fit_photos",
+      "label": "Photos to fit on mobile",
+      "info": "Photo numbers separated by commas, e.g. 2,3. Each of these photos is trimmed to the person, enlarged to the slide width and placed on the bottom edge, so they all line up. Leave blank for none. Desktop never changes."
     },
     {
       "type": "range",
-      "id": "mobile_zoom_percent",
-      "label": "Enlarge by",
-      "min": 100,
-      "max": 200,
-      "step": 5,
-      "unit": "%",
-      "default": 140,
-      "visible_if": "{{ block.settings.mobile_zoom_photos != blank }}"
-    },
-    {
-      "type": "range",
-      "id": "mobile_zoom_focus",
-      "label": "Zoom focus (height)",
-      "min": 0,
+      "id": "mobile_fit_width",
+      "label": "Person width",
+      "min": 60,
       "max": 100,
-      "step": 5,
+      "step": 2,
       "unit": "%",
+      "default": 90,
+      "info": "How much of the slide width the person fills. Lower it to leave more white between neighbouring photos.",
+      "visible_if": "{{ block.settings.mobile_fit_photos != blank }}"
+    },
+    {
+      "type": "range",
+      "id": "mobile_fit_bottom",
+      "label": "Space below the person",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
       "default": 0,
-      "info": "0% = enlarge from the top of the photo (keeps the head from being cut), 100% = from the bottom.",
-      "visible_if": "{{ block.settings.mobile_zoom_photos != blank }}"
+      "info": "Raise the photo a little if the caption covers it.",
+      "visible_if": "{{ block.settings.mobile_fit_photos != blank }}"
     },
     {
       "type": "header",
