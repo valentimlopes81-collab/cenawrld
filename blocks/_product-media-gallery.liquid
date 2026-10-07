@@ -320,6 +320,39 @@
     },
     {
       "type": "header",
+      "content": "Mobile photo zoom"
+    },
+    {
+      "type": "text",
+      "id": "mobile_zoom_photos",
+      "label": "Photos to enlarge on mobile",
+      "info": "Photo numbers separated by commas, e.g. 1,2. Leave blank for none. Desktop never changes."
+    },
+    {
+      "type": "range",
+      "id": "mobile_zoom_percent",
+      "label": "Enlarge by",
+      "min": 100,
+      "max": 200,
+      "step": 5,
+      "unit": "%",
+      "default": 140,
+      "visible_if": "{{ block.settings.mobile_zoom_photos != blank }}"
+    },
+    {
+      "type": "range",
+      "id": "mobile_zoom_focus",
+      "label": "Zoom focus (height)",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 35,
+      "info": "0% = enlarge from the top of the photo, 100% = from the bottom.",
+      "visible_if": "{{ block.settings.mobile_zoom_photos != blank }}"
+    },
+    {
+      "type": "header",
       "content": "t:content.padding"
     },
     {
