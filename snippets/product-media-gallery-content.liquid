@@ -330,12 +330,26 @@
   >
     {% capture slides %}
       {% for media in sorted_media %}
+        {%- liquid
+          assign photo_fit = false
+          if block_settings.mobile_fit_photos != blank
+            assign photo_fit_list = block_settings.mobile_fit_photos | remove: ' ' | split: ','
+            assign slide_number = forloop.index | append: ''
+            if photo_fit_list contains slide_number
+              assign photo_fit = true
+            endif
+          endif
+        -%}
         {% capture children %}
           {%- liquid
               if needs_both_sizes and forloop.first
                 assign media_sizes = sizes_single
               else
                 assign media_sizes = sizes
+              endif
+              if photo_fit
+                # these photos are enlarged on mobile: ask for a sharper file than the slide size suggests
+                assign media_sizes = '(min-width: 750px) 50vw, 220vw'
               endif
           -%}
           {% if block_settings.aspect_ratio != 'adapt' and block_settings.constrain_to_viewport %}
@@ -351,16 +365,6 @@
             <p class="product-media-caption">{{ block_settings.caption_text_2 }}</p>
           {% endif %}
         {% endcapture %}
-        {%- liquid
-          assign photo_fit = false
-          if block_settings.mobile_fit_photos != blank
-            assign photo_fit_list = block_settings.mobile_fit_photos | remove: ' ' | split: ','
-            assign slide_number = forloop.index | append: ''
-            if photo_fit_list contains slide_number
-              assign photo_fit = true
-            endif
-          endif
-        -%}
         {% capture class %}
           {{ product_media_container_class }} product-media-container--{{ media.media_type }}{% if block_settings.zoom %} product-media-container--zoomable{% endif %}{% if forloop.index0 == lowest_aspect_ratio_index and block_settings.aspect_ratio == 'adapt' %} product-media-container--tallest{% endif %}
         {% endcapture %}

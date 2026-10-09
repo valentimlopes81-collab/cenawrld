@@ -1,9 +1,10 @@
 /**
- * Mobile only. For the photos listed in the gallery setting "Photos to fit on mobile", find where the person is
+ * For the photos listed in the gallery setting "Photos to fit on mobile", find where the person is
  * inside the (often much bigger, transparent/white) photo canvas and scale + position the photo so the person
  * fills the slide width and rests on the bottom edge. All fitted photos then share the same baseline.
  *
- * The positioning itself is pure CSS (see product-media-gallery-content.liquid); this script only measures the
+ * Product page gallery: mobile only. Product cards (data-fit-always): every screen size.
+ * The positioning itself is pure CSS (see product-media-gallery-content.liquid / card-gallery.liquid); this script only measures the
  * photo once and writes three CSS variables on the slide: --fit-k, --fit-cx, --fit-y1.
  */
 (() => {
@@ -92,7 +93,7 @@
   }
 
   function process(slide) {
-    if (!mobile.matches) return;
+    if (!mobile.matches && !slide.hasAttribute('data-fit-always')) return;
     const img = slide.querySelector('.product-media__image');
     if (!img) return;
 

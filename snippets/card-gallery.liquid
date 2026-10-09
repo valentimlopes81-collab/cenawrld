@@ -106,6 +106,21 @@
         assign max_visible_slide_count = 2
       endif
 
+      # Photos to enlarge in this product's card (theme setting "Photos to enlarge in the cards")
+      assign card_fit_list = ''
+      if settings.card_photo_fit != blank
+        assign fit_lines = settings.card_photo_fit | newline_to_br | split: '<br />'
+        for fit_line in fit_lines
+          assign fit_parts = fit_line | strip | split: ':'
+          if fit_parts.size > 1
+            assign fit_key = fit_parts[0] | strip | downcase
+            if fit_key != blank and product.handle contains fit_key
+              assign card_fit_list = fit_parts[1] | remove: ' ' | split: ','
+            endif
+          endif
+        endfor
+      endif
+
       capture slides
         for media in media_list_to_show
           assign loading = 'lazy'
@@ -144,11 +159,20 @@
             assign class = class | append: ' constrain-height'
           endif
 
+          assign slide_attributes = attributes
+          if card_fit_list.size > 0
+            assign slide_number = forloop.index | append: ''
+            if card_fit_list contains slide_number
+              assign slide_attributes = attributes | append: ' data-photo-fit data-fit-always data-fit-width="90" data-fit-bottom="0"'
+              assign sizes = '(min-width: 750px) 100vw, 200vw'
+            endif
+          endif
+
           capture slideshow_children
             render 'product-media', media: media, sizes: sizes, loading: loading, preview_image_only: true
           endcapture
 
-          render 'slideshow-slide', slide_id: media.id, index: forloop.index0, hidden: hidden, class: class, attributes: attributes, children: slideshow_children, media_fit: media_fit
+          render 'slideshow-slide', slide_id: media.id, index: forloop.index0, hidden: hidden, class: class, attributes: slide_attributes, children: slideshow_children, media_fit: media_fit
         endfor
       endcapture
 
@@ -198,6 +222,9 @@
       endcapture
       render 'slideshow', ref: 'slideshow', slides: placeholder_slide, slide_count: 1, attributes: 'disabled="true"'
     %}
+  {%- endif -%}
+  {%- if card_fit_list.size > 0 -%}
+    <script src="{{ 'product-photo-fit.js' | asset_url }}" defer></script>
   {%- endif -%}
   {{ children }}
 </div>
@@ -364,5 +391,24 @@
 
   [product-grid-view='zoom-out'] .card-gallery .slideshow-control {
     min-width: auto;
+  }
+
+  /* Photos enlarged by product-photo-fit.js (settings: "Photos to enlarge in the cards") */
+  slideshow-slide[data-fit-ready][data-fit-always] .product-media {
+    position: relative;
+    align-self: stretch;
+    overflow: hidden;
+  }
+
+  slideshow-slide[data-fit-ready][data-fit-always] .product-media__image {
+    position: absolute;
+    bottom: 0;
+    left: calc(50% - var(--fit-cx) * var(--fit-k) * 100%);
+    width: calc(var(--fit-k) * 100%);
+    max-width: none;
+    height: auto;
+    aspect-ratio: auto;
+    object-fit: fill;
+    transform: translateY(calc((1 - var(--fit-y1)) * 100% - var(--fit-bottom, 0px)));
   }
 {% endstylesheet %}

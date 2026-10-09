@@ -2103,6 +2103,17 @@
         "id": "product_card_carousel",
         "label": "t:settings.product_card_carousel",
         "default": true
+      },
+      {
+        "type": "header",
+        "content": "Photo fit in product cards"
+      },
+      {
+        "type": "textarea",
+        "id": "card_photo_fit",
+        "label": "Photos to enlarge in the cards",
+        "info": "One rule per line: part of the product name in the link, a colon, then the photo numbers. Example: cherries: 3. The person is trimmed, enlarged and placed on the bottom edge. Leave empty for none.",
+        "default": "cherries: 3"
       }
     ]
   },
