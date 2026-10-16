@@ -7,9 +7,9 @@
   if (window.__cenaHomeGridFit) return;
   window.__cenaHomeGridFit = true;
 
-  const MAX_W = 0.84; // product width, as a share of the card width
-  const MAX_H = 0.8; // product height, as a share of the card height
-  const measured = new WeakMap();
+  const SIZE = 0.88; // target "size" of the product (geometric mean of its width and height), as a share of the card width
+  const MAX_W = 0.94; // the product never gets wider than this share of the card width
+  const MAX_H = 0.86; // ...or taller than this share of the card height
 
   /** Bounding box of the visible subject, as fractions (0..1) of the photo. */
   function measure(img) {
@@ -73,7 +73,8 @@
     const ratio = img.naturalWidth / img.naturalHeight;
     const bw = box.x1 - box.x0;
     const bh = box.y1 - box.y0;
-    const k = Math.min(MAX_W / bw, (MAX_H * H * ratio) / (bh * W)); // photo width / card width
+    // photo width / card width: same visual size for every product, within the caps
+    const k = Math.min(SIZE / Math.sqrt((bw * bh) / ratio), MAX_W / bw, (MAX_H * H * ratio) / (bh * W));
     const pw = k * W;
     const ph = pw / ratio;
     media.style.setProperty('--hg-w', pw.toFixed(1) + 'px');
@@ -87,17 +88,30 @@
     const img = media.querySelector('img');
     if (!img || media.hasAttribute('data-fit-done')) return;
     media.setAttribute('data-fit-done', '');
-    const run = () => {
-      let box;
-      try {
-        box = measure(img);
-      } catch (e) {
-        box = null; // unreadable: keep the default look
-      }
-      measured.set(img, box);
+    const apply = (box) => {
       if (!box) return;
       layout(media, img, box);
       if ('ResizeObserver' in window) new ResizeObserver(() => layout(media, img, box)).observe(media);
+    };
+    const run = () => {
+      // measure a CORS-enabled copy of the photo: the displayed one would taint the canvas
+      const probe = new Image();
+      probe.crossOrigin = 'anonymous';
+      probe.onload = () => {
+        try {
+          apply(measure(probe));
+        } catch (e) {
+          /* unreadable: keep the default look */
+        }
+      };
+      probe.onerror = () => {
+        try {
+          apply(measure(img));
+        } catch (e) {
+          /* unreadable: keep the default look */
+        }
+      };
+      probe.src = img.currentSrc || img.src;
     };
     img.loading = 'eager';
     if (img.complete && img.naturalWidth) run();
