@@ -363,6 +363,8 @@
             <p class="product-media-caption">{{ block_settings.caption_text }}</p>
           {% elsif block_settings.caption_text_2 != blank and forloop.index == block_settings.caption_image_index_2 %}
             <p class="product-media-caption">{{ block_settings.caption_text_2 }}</p>
+          {% elsif block_settings.caption_text_3 != blank and forloop.index == block_settings.caption_image_index_3 %}
+            <p class="product-media-caption">{{ block_settings.caption_text_3 }}</p>
           {% endif %}
         {% endcapture %}
         {% capture class %}
@@ -458,6 +460,9 @@
           {% elsif block_settings.caption_text_2 != blank and forloop.index == block_settings.caption_image_index_2 %}
             {% assign has_caption = true %}
             {% assign caption_for_media = block_settings.caption_text_2 %}
+          {% elsif block_settings.caption_text_3 != blank and forloop.index == block_settings.caption_image_index_3 %}
+            {% assign has_caption = true %}
+            {% assign caption_for_media = block_settings.caption_text_3 %}
           {% endif %}
           <li
             id="media-gallery-item-{{ block_id }}-{{ forloop.index0 }}"

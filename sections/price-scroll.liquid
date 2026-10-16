@@ -12,7 +12,7 @@
         <a class="home-grid__link" href="{{ product.url }}">
           <span class="home-grid__media">
             {%- if product.featured_image -%}
-              {{ product.featured_image | image_url: width: 800 | image_tag: loading: 'lazy', widths: '320, 480, 640, 800', sizes: '(min-width: 750px) 20vw, 50vw', alt: product.title }}
+              {{ product.featured_image | image_url: width: 1200 | image_tag: loading: 'lazy', widths: '480, 720, 960, 1200', sizes: '(min-width: 750px) 30vw, 90vw', alt: product.title }}
             {%- endif -%}
             {%- unless product.available -%}<span class="home-grid__soldout">Sold out</span>{%- endunless -%}
           </span>
@@ -23,6 +23,7 @@
     {%- endfor -%}
   </ul>
 </section>
+<script src="{{ 'home-grid-fit.js' | asset_url }}" defer></script>
 
 {% stylesheet %}
   .home-grid { background: #fff; color: #000; padding: 24px 0 40px; }
@@ -40,6 +41,11 @@
   .home-grid__media img {
     width: 100%; height: 100%; object-fit: contain; display: block;
     padding: 12% 10%; box-sizing: border-box; transition: transform .4s ease;
+  }
+  /* set by home-grid-fit.js: the product is scaled and centred so every cover looks about the same size */
+  .home-grid__media[data-fit-ready] img {
+    position: absolute; top: var(--hg-y); left: var(--hg-x); padding: 0; max-width: none;
+    width: var(--hg-w); height: var(--hg-h);
   }
   @media (hover: hover) { .home-grid__link:hover .home-grid__media img { transform: scale(1.04); } }
   .home-grid__soldout {

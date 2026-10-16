@@ -319,6 +319,22 @@
       "visible_if": "{{ block.settings.caption_text_2 != blank }}"
     },
     {
+      "type": "text",
+      "id": "caption_text_3",
+      "label": "Third caption text",
+      "info": "Optional caption for a third photo (e.g. another model)."
+    },
+    {
+      "type": "range",
+      "id": "caption_image_index_3",
+      "label": "Which photo gets the third caption",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 5,
+      "visible_if": "{{ block.settings.caption_text_3 != blank }}"
+    },
+    {
       "type": "header",
       "content": "Mobile photo fit"
     },
@@ -348,8 +364,8 @@
       "max": 120,
       "step": 4,
       "unit": "px",
-      "default": 0,
-      "info": "Raise the photo a little if the caption covers it.",
+      "default": 32,
+      "info": "Gap between the person and the product title. Raise it if the caption covers the photo.",
       "visible_if": "{{ block.settings.mobile_fit_photos != blank }}"
     },
     {
