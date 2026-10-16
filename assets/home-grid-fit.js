@@ -7,9 +7,9 @@
   if (window.__cenaHomeGridFit) return;
   window.__cenaHomeGridFit = true;
 
-  const SIZE = 0.88; // target "size" of the product (geometric mean of its width and height), as a share of the card width
-  const MAX_W = 0.94; // the product never gets wider than this share of the card width
-  const MAX_H = 0.86; // ...or taller than this share of the card height
+  const SIZE = 0.82; // target "size" of the product (geometric mean of its width and height), as a share of the card width
+  const MAX_W = 0.86; // the product never gets wider than this share of the card width
+  const MAX_H = 0.82; // ...or taller than this share of the card height
 
   /** Bounding box of the visible subject, as fractions (0..1) of the photo. */
   function measure(img) {
