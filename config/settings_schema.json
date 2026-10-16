@@ -2114,6 +2114,13 @@
         "label": "Photos to enlarge in the cards",
         "info": "One rule per line: part of the product name in the link, a colon, then the photo numbers. Example: cherries: 3. The person is trimmed, enlarged and placed on the bottom edge. Leave empty for none.",
         "default": "cherries: 3"
+      },
+      {
+        "type": "textarea",
+        "id": "card_cover_scale",
+        "label": "Cover photo size in the cards",
+        "info": "One rule per line: part of the product name in the link, a colon, then a size from 1.05 to 1.5 in steps of 0.05. Example: hustle: 1.2. Makes the first photo a little bigger so all products look the same size. Leave empty for none.",
+        "default": "hustle: 1.2"
       }
     ]
   },

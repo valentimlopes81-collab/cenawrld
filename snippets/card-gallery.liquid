@@ -121,6 +121,21 @@
         endfor
       endif
 
+      # Cover photo size in this product's card (theme setting "Cover photo size in the cards")
+      assign card_scale = 0
+      if settings.card_cover_scale != blank
+        assign scale_lines = settings.card_cover_scale | newline_to_br | split: '<br />'
+        for scale_line in scale_lines
+          assign scale_parts = scale_line | strip | split: ':'
+          if scale_parts.size > 1
+            assign scale_key = scale_parts[0] | strip | downcase
+            if scale_key != blank and product.handle contains scale_key
+              assign card_scale = scale_parts[1] | strip | times: 100 | round
+            endif
+          endif
+        endfor
+      endif
+
       capture slides
         for media in media_list_to_show
           assign loading = 'lazy'
@@ -166,6 +181,10 @@
               assign slide_attributes = attributes | append: ' data-photo-fit data-fit-always data-fit-width="90" data-fit-bottom="0"'
               assign sizes = '(min-width: 750px) 100vw, 200vw'
             endif
+          endif
+
+          if card_scale > 100 and forloop.first
+            assign slide_attributes = slide_attributes | append: ' data-card-scale="' | append: card_scale | append: '"'
           endif
 
           capture slideshow_children
@@ -411,4 +430,16 @@
     object-fit: fill;
     transform: translateY(calc((1 - var(--fit-y1)) * 100% - var(--fit-bottom, 0px)));
   }
+
+  /* Cover photo size (setting: "Cover photo size in the cards") */
+  slideshow-slide[data-card-scale="105"] .product-media__image { transform: scale(1.05); }
+  slideshow-slide[data-card-scale="110"] .product-media__image { transform: scale(1.1); }
+  slideshow-slide[data-card-scale="115"] .product-media__image { transform: scale(1.15); }
+  slideshow-slide[data-card-scale="120"] .product-media__image { transform: scale(1.2); }
+  slideshow-slide[data-card-scale="125"] .product-media__image { transform: scale(1.25); }
+  slideshow-slide[data-card-scale="130"] .product-media__image { transform: scale(1.3); }
+  slideshow-slide[data-card-scale="135"] .product-media__image { transform: scale(1.35); }
+  slideshow-slide[data-card-scale="140"] .product-media__image { transform: scale(1.4); }
+  slideshow-slide[data-card-scale="145"] .product-media__image { transform: scale(1.45); }
+  slideshow-slide[data-card-scale="150"] .product-media__image { transform: scale(1.5); }
 {% endstylesheet %}
