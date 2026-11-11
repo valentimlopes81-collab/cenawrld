@@ -369,6 +369,25 @@
       "visible_if": "{{ block.settings.mobile_fit_photos != blank }}"
     },
     {
+      "type": "text",
+      "id": "mobile_center_photos",
+      "label": "Product photos to center on mobile",
+      "default": "1",
+      "info": "Photo numbers separated by commas. Each of these photos is trimmed to the product, scaled to the same size and placed in the middle of the slide. Leave blank for none. Desktop never changes."
+    },
+    {
+      "type": "range",
+      "id": "mobile_center_width",
+      "label": "Product width",
+      "min": 60,
+      "max": 96,
+      "step": 2,
+      "unit": "%",
+      "default": 86,
+      "info": "How much of the slide width the product fills.",
+      "visible_if": "{{ block.settings.mobile_center_photos != blank }}"
+    },
+    {
       "type": "header",
       "content": "t:content.padding"
     },

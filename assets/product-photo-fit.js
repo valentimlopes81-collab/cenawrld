@@ -2,6 +2,8 @@
  * For the photos listed in the gallery setting "Photos to fit on mobile", find where the person is
  * inside the (often much bigger, transparent/white) photo canvas and scale + position the photo so the person
  * fills the slide width and rests on the bottom edge. All fitted photos then share the same baseline.
+ * Photos listed in "Product photos to center on mobile" (data-fit-mode="center") are scaled so the product always
+ * has the same size and are placed in the middle of the slide.
  *
  * Product page gallery: mobile only. Product cards (data-fit-always): every screen size.
  * The positioning itself is pure CSS (see product-media-gallery-content.liquid / card-gallery.liquid); this script only measures the
@@ -80,10 +82,18 @@
     const bh = box.y1 - box.y0;
     const ratio = img.naturalWidth / img.naturalHeight;
 
+    const center = slide.dataset.fitMode === 'center';
+    const maxHeight = (parseFloat(slide.dataset.fitMaxHeight) || 68) / 100;
+
     let k = fitWidth / bw; // photo width, as a multiple of the slide width
     if (W > 0 && H > 0) {
-      // the person must also fit inside the slide height
-      k = Math.min(k, ((H - bottom) * ratio) / (bh * W));
+      // the person must also fit inside the slide height (a centred product: inside the given share of it)
+      k = center ? Math.min(k, (maxHeight * H * ratio) / (bh * W)) : Math.min(k, ((H - bottom) * ratio) / (bh * W));
+    }
+    if (center) {
+      // the middle of the product goes to the middle of the slide
+      const photoHeight = (k * W) / ratio;
+      slide.style.setProperty('--fit-top', (H / 2 - ((box.y0 + box.y1) / 2) * photoHeight).toFixed(1) + 'px');
     }
     slide.style.setProperty('--fit-k', k.toFixed(4));
     slide.style.setProperty('--fit-cx', ((box.x0 + box.x1) / 2).toFixed(4));

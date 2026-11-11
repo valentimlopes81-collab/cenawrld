@@ -185,7 +185,7 @@
     type="module"
   ></script>
 {%- endif -%}
-{%- if block_settings.mobile_fit_photos != blank -%}
+{%- if block_settings.mobile_fit_photos != blank or block_settings.mobile_center_photos != blank -%}
   <script src="{{ 'product-photo-fit.js' | asset_url }}" defer></script>
 {%- endif -%}
 
@@ -324,7 +324,7 @@
         media-gallery--extend
       {% endif %}
     "
-    style="{% render 'spacing-style', settings: block_settings %} --thumbnail-width: {{ block_settings.thumbnail_width }}px; --media-radius: {{ block_settings.media_radius }}px;{% if block_settings.icons_style contains 'large' %} --slideshow-icon-padding: 0px;{% endif %}--image-gap: {{ block_settings.image_gap }}px;{% unless block_settings.aspect_ratio == 'adapt' %} --gallery-aspect-ratio: {{ block_settings.aspect_ratio }};{% endunless %}"
+    style="{% render 'spacing-style', settings: block_settings %} --thumbnail-width: {{ block_settings.thumbnail_width }}px; --media-radius: {{ block_settings.media_radius }}px;{% if block_settings.icons_style contains 'large' %} --slideshow-icon-padding: 0px;{% endif %}--image-gap: {{ block_settings.image_gap }}px;{% unless block_settings.aspect_ratio == 'adapt' %} --gallery-aspect-ratio: {{ block_settings.aspect_ratio }};{% endunless %}{% if block_settings.aspect_ratio == 'adapt' and lowest_aspect_ratio < 50 %} --mobile-slide-ratio: {{ lowest_aspect_ratio }};{% endif %}"
     data-presentation="{{ media_presentation }}"
     {{ block_shopify_attributes }}
   >
@@ -332,11 +332,18 @@
       {% for media in sorted_media %}
         {%- liquid
           assign photo_fit = false
+          assign photo_center = false
+          assign slide_number = forloop.index | append: ''
           if block_settings.mobile_fit_photos != blank
             assign photo_fit_list = block_settings.mobile_fit_photos | remove: ' ' | split: ','
-            assign slide_number = forloop.index | append: ''
             if photo_fit_list contains slide_number
               assign photo_fit = true
+            endif
+          endif
+          if photo_fit == false and block_settings.mobile_center_photos != blank
+            assign photo_center_list = block_settings.mobile_center_photos | remove: ' ' | split: ','
+            if photo_center_list contains slide_number
+              assign photo_center = true
             endif
           endif
         -%}
@@ -347,7 +354,7 @@
               else
                 assign media_sizes = sizes
               endif
-              if photo_fit
+              if photo_fit or photo_center
                 # these photos are enlarged on mobile: ask for a sharper file than the slide size suggests
                 assign media_sizes = '(min-width: 750px) 50vw, 220vw'
               endif
@@ -385,6 +392,9 @@
           assign slide_attributes = attributes
           if photo_fit
             assign fit_attributes = ' data-photo-fit data-fit-width="' | append: block_settings.mobile_fit_width | append: '" data-fit-bottom="' | append: block_settings.mobile_fit_bottom | append: '"'
+            assign slide_attributes = attributes | append: fit_attributes
+          elsif photo_center
+            assign fit_attributes = ' data-photo-fit data-fit-mode="center" data-fit-width="' | append: block_settings.mobile_center_width | append: '" data-fit-max-height="68"'
             assign slide_attributes = attributes | append: fit_attributes
           endif
         -%}
@@ -903,8 +913,35 @@
     height: 100vh;
   }
 
-  /* Mobile only: photos listed in "Photos to fit on mobile" are measured by product-photo-fit.js and then
-     positioned here, so the person fills the slide width and rests on the bottom edge. */
+  /* Mobile swipe gallery: every photo gets the same box (the shape of the tallest photo) and sits in its middle,
+     so no photo hangs at the top or the bottom and the title is always the same distance away. */
+  @media screen and (max-width: 749px) {
+    media-gallery.media-gallery--hint slideshow-slide.product-media-container {
+      aspect-ratio: var(--mobile-slide-ratio, var(--gallery-aspect-ratio, auto));
+    }
+
+    media-gallery.media-gallery--hint slideshow-slide.product-media-container--image .product-media {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      aspect-ratio: auto;
+    }
+
+    media-gallery.media-gallery--hint
+      slideshow-slide.product-media-container--image:not([data-fit-ready])
+      .product-media__image {
+      width: 100%;
+      height: 100%;
+      aspect-ratio: auto;
+      object-fit: contain;
+      object-position: center center;
+    }
+  }
+
+  /* Mobile only: photos listed in "Photos to fit on mobile" / "Product photos to center on mobile" are measured by
+     product-photo-fit.js and then positioned here: a person fills the slide width and rests on the bottom edge,
+     a product photo is scaled to the same size every time and placed in the middle. */
   @media screen and (max-width: 749px) {
     slideshow-slide[data-fit-ready] .product-media {
       position: relative;
@@ -922,6 +959,12 @@
       aspect-ratio: auto;
       object-fit: fill;
       transform: translateY(calc((1 - var(--fit-y1)) * 100% - var(--fit-bottom, 0px)));
+    }
+
+    slideshow-slide[data-fit-ready][data-fit-mode='center'] .product-media__image {
+      top: var(--fit-top, 0px);
+      bottom: auto;
+      transform: none;
     }
   }
 {% endstylesheet %}
