@@ -937,6 +937,13 @@
       object-fit: contain;
       object-position: center center;
     }
+
+    /* close-ups cut off by the bottom edge of the photo sit on the bottom of the slide (set by product-photo-fit.js) */
+    media-gallery.media-gallery--hint
+      slideshow-slide.product-media-container--image[data-anchor-bottom]:not([data-fit-ready])
+      .product-media__image {
+      object-position: center bottom;
+    }
   }
 
   /* Mobile only: photos listed in "Photos to fit on mobile" / "Product photos to center on mobile" are measured by

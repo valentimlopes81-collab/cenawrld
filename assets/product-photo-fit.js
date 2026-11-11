@@ -4,6 +4,8 @@
  * fills the slide width and rests on the bottom edge. All fitted photos then share the same baseline.
  * Photos listed in "Product photos to center on mobile" (data-fit-mode="center") are scaled so the product always
  * has the same size and are placed in the middle of the slide.
+ * Any other gallery photo whose subject is cut off by the bottom edge of the photo (a close-up) gets
+ * data-anchor-bottom, so it sits on the bottom of the slide.
  *
  * Product page gallery: mobile only. Product cards (data-fit-always): every screen size.
  * The positioning itself is pure CSS (see product-media-gallery-content.liquid / card-gallery.liquid); this script only measures the
@@ -15,6 +17,9 @@
 
   const mobile = window.matchMedia('(max-width: 749px)');
   const SELECTOR = 'slideshow-slide[data-photo-fit]';
+  // the other photos of the mobile swipe gallery: a photo whose subject is cut off by its bottom edge (a close-up)
+  // is anchored to the bottom of the slide instead of floating in the middle
+  const OTHERS = 'media-gallery.media-gallery--hint slideshow-slide.product-media-container--image:not([data-photo-fit])';
   const measured = new WeakMap(); // img -> {x0,x1,y0,y1} | null
   const observed = new WeakSet();
 
@@ -130,10 +135,29 @@
     else img.addEventListener('load', run, { once: true });
   }
 
+  function anchor(slide) {
+    if (!mobile.matches || slide.hasAttribute('data-anchor-checked')) return;
+    const img = slide.querySelector('.product-media__image');
+    if (!img) return;
+    slide.setAttribute('data-anchor-checked', '');
+    const run = () => {
+      let box;
+      try {
+        box = measure(img);
+      } catch (e) {
+        box = null;
+      }
+      if (box && box.y1 > 0.985) slide.setAttribute('data-anchor-bottom', '');
+    };
+    if (img.complete && img.naturalWidth) run();
+    else img.addEventListener('load', run, { once: true });
+  }
+
   function scan() {
     document.querySelectorAll(SELECTOR).forEach((slide) => {
       if (!slide.hasAttribute('data-fit-ready')) process(slide);
     });
+    document.querySelectorAll(OTHERS).forEach(anchor);
   }
 
   scan();
