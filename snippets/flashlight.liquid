@@ -54,6 +54,16 @@
       cursor: auto;
     }
   }
+  /* the password dialog sits above the darkness, with a normal cursor; after a wrong password Shopify reloads the
+     page with the dialog already open (not modal), so it is lifted above the torch canvas here */
+  .cena-torch-on .password-dialog {
+    cursor: auto;
+  }
+  .cena-torch-on .password-dialog[open] {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+  }
   /* the email block sits in the exact middle of the screen; the footer link is pinned to the bottom */
   .cena-torch-on,
   .cena-torch-on body {
