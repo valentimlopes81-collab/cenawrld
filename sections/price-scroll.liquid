@@ -14,10 +14,16 @@
             {%- if product.featured_image -%}
               {{ product.featured_image | image_url: width: 1200 | image_tag: loading: 'lazy', widths: '480, 720, 960, 1200', sizes: '(min-width: 750px) 30vw, 90vw', alt: product.title }}
             {%- endif -%}
-            {%- unless product.available -%}<span class="home-grid__soldout">Sold out</span>{%- endunless -%}
+            {%- render 'sale-badge', product: product -%}
+            {%- render 'gone-overlay', product: product -%}
           </span>
           <span class="home-grid__title">{{ product.title }}</span>
-          <span class="home-grid__price">{{ product.price | money_with_currency }}</span>
+          <span class="home-grid__price">
+            {{- product.price | money_with_currency -}}
+            {%- if product.compare_at_price > product.price -%}
+              <s class="home-grid__compare">{{ product.compare_at_price | money_with_currency }}</s>
+            {%- endif -%}
+          </span>
         </a>
       </li>
     {%- endfor -%}
@@ -48,15 +54,12 @@
     width: var(--hg-w); height: var(--hg-h);
   }
   @media (hover: hover) { .home-grid__link:hover .home-grid__media img { transform: scale(1.04); } }
-  .home-grid__soldout {
-    position: absolute; top: 8px; left: 8px; padding: 3px 8px; font-size: 11px; font-weight: 700;
-    letter-spacing: .4px; text-transform: uppercase; background: #000; color: #fff;
-  }
   .home-grid__title {
     display: block; margin-top: 10px; padding-inline: 24px; font-size: 14px; letter-spacing: .2px;
     text-transform: uppercase; color: #3a3a3a;
   }
   .home-grid__price { display: block; margin-top: 4px; padding-inline: 24px; font-size: 14px; color: #3a3a3a; }
+  .home-grid__compare { margin-inline-start: .6em; color: #b3121f; text-decoration-thickness: 1.5px; }
   @media (max-width: 749px) {
     .home-grid__title, .home-grid__price { padding-inline: 4px; font-size: 12px; }
     /* mobile: horizontal swipe carousel */

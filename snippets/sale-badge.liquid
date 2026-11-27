@@ -1,0 +1,54 @@
+{%- doc -%}
+  Red "NN% OFF" square for a product on sale (compare-at price higher than the price), rounded to the nearest 5%.
+  Nothing is rendered when the product is not on sale or is sold out.
+
+  @param {product} product - The product
+  @param {string} [class] - Extra classes ('sale-badge--static' to place it yourself instead of the top-left corner)
+
+  @example
+  {% render 'sale-badge', product: product %}
+{%- enddoc -%}
+
+{%- liquid
+  assign sale_percent = 0
+  if product.available and product.compare_at_price_max > product.price_min
+    assign sale_compare = product.compare_at_price_max
+    assign sale_percent = sale_compare | minus: product.price_min | times: 100.0 | divided_by: sale_compare | divided_by: 5.0 | round | times: 5
+  endif
+-%}
+{%- if sale_percent > 0 -%}
+  <span class="sale-badge {{ class }}">{{ sale_percent }}% OFF</span>
+{%- endif -%}
+
+{% stylesheet %}
+  .sale-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 3;
+    display: inline-block;
+    padding: 5px 9px 4px;
+    background: #b3121f;
+    color: #fff;
+    font-family: var(--font-body--family);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .sale-badge--static {
+    position: static;
+  }
+
+  @media screen and (min-width: 750px) {
+    .sale-badge {
+      top: 14px;
+      left: 14px;
+      font-size: 12px;
+    }
+  }
+{% endstylesheet %}

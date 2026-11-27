@@ -2121,9 +2121,15 @@ product-price.text-block:is(.h1, .h2, .h3, .h4, .h5, .h6) > *:not(.tax-note) {
 }
 
 .compare-at-price {
-  opacity: 0.4;
+  /* CENA: old price in red, struck through, next to the new one */
+  color: #b3121f;
   text-decoration-line: line-through;
   text-decoration-thickness: 1.5px;
+  text-decoration-color: currentcolor;
+}
+
+[ref='priceContainer'] .compare-at-price {
+  margin-inline-start: 0.6em;
 }
 
 .card-gallery {

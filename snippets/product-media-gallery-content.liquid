@@ -373,6 +373,7 @@
           {% elsif block_settings.caption_text_3 != blank and forloop.index == block_settings.caption_image_index_3 %}
             <p class="product-media-caption">{{ block_settings.caption_text_3 }}</p>
           {% endif %}
+          {% if forloop.first %}{% render 'sale-badge', product: selected_product %}{% endif %}
         {% endcapture %}
         {% capture class %}
           {{ product_media_container_class }} product-media-container--{{ media.media_type }}{% if block_settings.zoom %} product-media-container--zoomable{% endif %}{% if forloop.index0 == lowest_aspect_ratio_index and block_settings.aspect_ratio == 'adapt' %} product-media-container--tallest{% endif %}
@@ -510,6 +511,7 @@
             {% if has_caption %}
               <p class="product-media-caption">{{ caption_for_media }}</p>
             {% endif %}
+            {% if forloop.first %}{% render 'sale-badge', product: selected_product %}{% endif %}
           </li>
         {% endfor %}
       </ul>

@@ -9,7 +9,8 @@
 
 {%- liquid
   assign show_unit_price = show_unit_price | default: false
-  assign show_sale_price_first = show_sale_price_first | default: false
+  # CENA: the new price always comes first, the old one after it (red, struck through)
+  assign show_sale_price_first = true
   assign selected_variant = product_resource.selected_or_first_available_variant
   assign price = selected_variant.price
   assign compare_at_price = selected_variant.compare_at_price
